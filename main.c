@@ -1,29 +1,27 @@
-#include <std.int.h>
+#include <stdint.h>
 #include <stdbool.h>
 #include "tm4c123gh6pm.h"
 #include "lcd.h"
 
-extern volatile INT16S ticks;
+extern volatile int16_t ticks;
 
-INT16S alive_timer = MILLISEC(100);
+int16_t alive_timer;
 
 int main(void)
 {
+	init_lcd(); // Initialize LCD (4-bit mode, 2-line)
+
+	clear_lcd();
+    print_lcd("Welcome to the");// Line 1
+
+    command_lcd(0xC0); // goes a line down
+
+    print_lcd("Coffee Machine!");// Line 2
+
+
 	// Application loop
 	while(1)
 	{
 		
 	}
-
-	return 0;
-}
-
-void Init_LCD(void)
-{
-
-}
-
-void LCD_WriteString(char *str)
-{
-
 }
