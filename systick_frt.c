@@ -2,7 +2,7 @@
 * University of Southern Denmark
 * Embedded Programming (EMP)
 *
-* MODULENAME.: emp.c
+* MODULENAME.: systick_frt.c
 *
 * PROJECT....: EMP
 *
@@ -21,6 +21,7 @@
 #include <stdint.h>
 #include "tm4c123gh6pm.h"
 #include "emp_type.h"
+#include "systick_frt.h"
 /*****************************    Defines    *******************************/
 
 #define SYSTICK_RELOAD_VALUE 80000              // 5 mS
