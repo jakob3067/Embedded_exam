@@ -24,6 +24,8 @@
 #include "lcd.h"
 #include "glob_def.h"
 #include "tmodel.h"
+#include "FreeRTOS.h"
+#include "task.h"
 //#include "sem.h"
 
 
@@ -306,6 +308,50 @@ void lcd_task(INT8U my_id, INT8U my_state, INT8U event, INT8U data)
       }
 	  break;
   }
+}
+
+void lcd_freertos_task(void *pvParameters)
+/*****************************************************************************
+*   Input    : pvParameters (unused)
+*   Output   : -
+*   Function : FreeRTOS LCD task - initializes and runs the LCD display
+******************************************************************************/
+{
+    INT8U init_idx = 0;
+    INT8U *pStr;
+    char msg[] = "LCD Ready";
+    
+    (void)pvParameters;
+    
+    // Send LCD initialization sequence
+    for(init_idx = 0; LCD_init_sequense[init_idx] != 0xFF; init_idx++)
+    {
+        wr_ctrl_LCD(LCD_init_sequense[init_idx]);
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
+    
+    // Clear display
+    clr_LCD();
+    vTaskDelay(pdMS_TO_TICKS(50));
+    
+    // Home cursor
+    home_LCD();
+    vTaskDelay(pdMS_TO_TICKS(50));
+    
+    // Write message directly to LCD hardware
+    pStr = (INT8U *)msg;
+    while(*pStr)
+    {
+        out_LCD(*pStr);
+        vTaskDelay(pdMS_TO_TICKS(20));
+        pStr++;
+    }
+    
+    // Keep task alive
+    while(1)
+    {
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
 }
 
 
