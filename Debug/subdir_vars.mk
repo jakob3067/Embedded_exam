@@ -11,26 +11,31 @@ ASM_SRCS += \
 
 C_SRCS += \
 ../heap_2.c \
+../lcd.c \
 ../list.c \
 ../main.c \
 ../port.c \
 ../queue.c \
 ../startup_frt.c \
 ../systick_frt.c \
-../tasks.c 
+../tasks.c \
+../tm4c123gh6pm_startup_ccs.c 
 
 C_DEPS += \
 ./heap_2.d \
+./lcd.d \
 ./list.d \
 ./main.d \
 ./port.d \
 ./queue.d \
 ./startup_frt.d \
 ./systick_frt.d \
-./tasks.d 
+./tasks.d \
+./tm4c123gh6pm_startup_ccs.d 
 
 OBJS += \
 ./heap_2.obj \
+./lcd.obj \
 ./list.obj \
 ./main.obj \
 ./port.obj \
@@ -38,13 +43,15 @@ OBJS += \
 ./queue.obj \
 ./startup_frt.obj \
 ./systick_frt.obj \
-./tasks.obj 
+./tasks.obj \
+./tm4c123gh6pm_startup_ccs.obj 
 
 ASM_DEPS += \
 ./portasm.d 
 
 OBJS__QUOTED += \
 "heap_2.obj" \
+"lcd.obj" \
 "list.obj" \
 "main.obj" \
 "port.obj" \
@@ -52,30 +59,35 @@ OBJS__QUOTED += \
 "queue.obj" \
 "startup_frt.obj" \
 "systick_frt.obj" \
-"tasks.obj" 
+"tasks.obj" \
+"tm4c123gh6pm_startup_ccs.obj" 
 
 C_DEPS__QUOTED += \
 "heap_2.d" \
+"lcd.d" \
 "list.d" \
 "main.d" \
 "port.d" \
 "queue.d" \
 "startup_frt.d" \
 "systick_frt.d" \
-"tasks.d" 
+"tasks.d" \
+"tm4c123gh6pm_startup_ccs.d" 
 
 ASM_DEPS__QUOTED += \
 "portasm.d" 
 
 C_SRCS__QUOTED += \
 "../heap_2.c" \
+"../lcd.c" \
 "../list.c" \
 "../main.c" \
 "../port.c" \
 "../queue.c" \
 "../startup_frt.c" \
 "../systick_frt.c" \
-"../tasks.c" 
+"../tasks.c" \
+"../tm4c123gh6pm_startup_ccs.c" 
 
 ASM_SRCS__QUOTED += \
 "../portasm.asm" 

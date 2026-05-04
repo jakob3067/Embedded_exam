@@ -1,4 +1,5 @@
 "./heap_2.obj"
+"./lcd.obj"
 "./list.obj"
 "./main.obj"
 "./port.obj"
@@ -7,5 +8,6 @@
 "./startup_frt.obj"
 "./systick_frt.obj"
 "./tasks.obj"
+"./tm4c123gh6pm_startup_ccs.obj"
 "../tm4c123gh6pm.cmd"
 -llibc.a
