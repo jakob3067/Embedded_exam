@@ -36,8 +36,20 @@ static void setupHardware(void)
 int main(void)
 {
     setupHardware();
+    init_lcd();
+    print_lcd("Welcome");
+
     xTaskCreate( status_led_task, "Status_led", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL );
+<<<<<<< HEAD
     xTaskCreate(lcd_freertos_task, "LCD", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
+=======
+    xTaskCreate( lcd_task, "LCD", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL );
+
+>>>>>>> origin/main
     vTaskStartScheduler();
-	return 0;
+
+	while(1){
+	    // Write to the LCD
+
+	}
 }
