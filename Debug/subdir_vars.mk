@@ -17,9 +17,9 @@ C_SRCS += \
 ../port.c \
 ../queue.c \
 ../startup_frt.c \
+../status_led.c \
 ../systick_frt.c \
-../tasks.c \
-../tm4c123gh6pm_startup_ccs.c 
+../tasks.c 
 
 C_DEPS += \
 ./heap_2.d \
@@ -29,9 +29,9 @@ C_DEPS += \
 ./port.d \
 ./queue.d \
 ./startup_frt.d \
+./status_led.d \
 ./systick_frt.d \
-./tasks.d \
-./tm4c123gh6pm_startup_ccs.d 
+./tasks.d 
 
 OBJS += \
 ./heap_2.obj \
@@ -42,9 +42,9 @@ OBJS += \
 ./portasm.obj \
 ./queue.obj \
 ./startup_frt.obj \
+./status_led.obj \
 ./systick_frt.obj \
-./tasks.obj \
-./tm4c123gh6pm_startup_ccs.obj 
+./tasks.obj 
 
 ASM_DEPS += \
 ./portasm.d 
@@ -58,9 +58,9 @@ OBJS__QUOTED += \
 "portasm.obj" \
 "queue.obj" \
 "startup_frt.obj" \
+"status_led.obj" \
 "systick_frt.obj" \
-"tasks.obj" \
-"tm4c123gh6pm_startup_ccs.obj" 
+"tasks.obj" 
 
 C_DEPS__QUOTED += \
 "heap_2.d" \
@@ -70,9 +70,9 @@ C_DEPS__QUOTED += \
 "port.d" \
 "queue.d" \
 "startup_frt.d" \
+"status_led.d" \
 "systick_frt.d" \
-"tasks.d" \
-"tm4c123gh6pm_startup_ccs.d" 
+"tasks.d" 
 
 ASM_DEPS__QUOTED += \
 "portasm.d" 
@@ -85,9 +85,9 @@ C_SRCS__QUOTED += \
 "../port.c" \
 "../queue.c" \
 "../startup_frt.c" \
+"../status_led.c" \
 "../systick_frt.c" \
-"../tasks.c" \
-"../tm4c123gh6pm_startup_ccs.c" 
+"../tasks.c" 
 
 ASM_SRCS__QUOTED += \
 "../portasm.asm" 

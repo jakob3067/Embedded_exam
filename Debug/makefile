@@ -16,9 +16,9 @@ ORDERED_OBJS += \
 "./portasm.obj" \
 "./queue.obj" \
 "./startup_frt.obj" \
+"./status_led.obj" \
 "./systick_frt.obj" \
 "./tasks.obj" \
-"./tm4c123gh6pm_startup_ccs.obj" \
 "../tm4c123gh6pm.cmd" \
 $(GEN_CMDS__FLAG) \
 -llibc.a \
@@ -149,8 +149,8 @@ Embedded_exam.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)
-	-$(RM) "heap_2.obj" "lcd.obj" "list.obj" "main.obj" "port.obj" "portasm.obj" "queue.obj" "startup_frt.obj" "systick_frt.obj" "tasks.obj" "tm4c123gh6pm_startup_ccs.obj" 
-	-$(RM) "heap_2.d" "lcd.d" "list.d" "main.d" "port.d" "queue.d" "startup_frt.d" "systick_frt.d" "tasks.d" "tm4c123gh6pm_startup_ccs.d" 
+	-$(RM) "heap_2.obj" "lcd.obj" "list.obj" "main.obj" "port.obj" "portasm.obj" "queue.obj" "startup_frt.obj" "status_led.obj" "systick_frt.obj" "tasks.obj" 
+	-$(RM) "heap_2.d" "lcd.d" "list.d" "main.d" "port.d" "queue.d" "startup_frt.d" "status_led.d" "systick_frt.d" "tasks.d" 
 	-$(RM) "portasm.d" 
 	-@echo 'Finished clean'
 	-@echo ' '

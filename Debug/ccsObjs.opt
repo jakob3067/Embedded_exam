@@ -6,8 +6,8 @@
 "./portasm.obj"
 "./queue.obj"
 "./startup_frt.obj"
+"./status_led.obj"
 "./systick_frt.obj"
 "./tasks.obj"
-"./tm4c123gh6pm_startup_ccs.obj"
 "../tm4c123gh6pm.cmd"
 -llibc.a
