@@ -2,25 +2,31 @@
 # Automatically-generated file. Do not edit!
 ################################################################################
 
-SHELL = cmd.exe
-
-CG_TOOL_ROOT := C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS
+CG_TOOL_ROOT := /home/jakob/ti/ccs1260/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS
 
 GEN_OPTS__FLAG := 
 GEN_CMDS__FLAG := 
 
 ORDERED_OBJS += \
+"./heap_2.obj" \
 "./lcd.obj" \
+"./list.obj" \
 "./main.obj" \
-"./tm4c123gh6pm_startup_ccs.obj" \
+"./port.obj" \
+"./portasm.obj" \
+"./queue.obj" \
+"./startup_frt.obj" \
+"./status_led.obj" \
+"./systick_frt.obj" \
+"./tasks.obj" \
 "../tm4c123gh6pm.cmd" \
 $(GEN_CMDS__FLAG) \
 -llibc.a \
 
 -include ../makefile.init
 
-RM := DEL /F
-RMDIR := RMDIR /S/Q
+RM := rm -rf
+RMDIR := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
@@ -136,15 +142,16 @@ all: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 Embedded_exam.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: Arm Linker'
-	"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"Embedded_exam.map" --heap_size=0 --stack_size=512 -i"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/lib" -i"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="Embedded_exam_linkInfo.xml" --rom_model -o "Embedded_exam.out" $(ORDERED_OBJS)
+	"/home/jakob/ti/ccs1260/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"Embedded_exam.map" --heap_size=0 --stack_size=512 -i"/home/jakob/ti/ccs1260/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/lib" -i"/home/jakob/ti/ccs1260/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="Embedded_exam_linkInfo.xml" --rom_model -o "Embedded_exam.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)
-	-$(RM) "lcd.obj" "main.obj" "tm4c123gh6pm_startup_ccs.obj" 
-	-$(RM) "lcd.d" "main.d" "tm4c123gh6pm_startup_ccs.d" 
+	-$(RM) "heap_2.obj" "lcd.obj" "list.obj" "main.obj" "port.obj" "portasm.obj" "queue.obj" "startup_frt.obj" "status_led.obj" "systick_frt.obj" "tasks.obj" 
+	-$(RM) "heap_2.d" "lcd.d" "list.d" "main.d" "port.d" "queue.d" "startup_frt.d" "status_led.d" "systick_frt.d" "tasks.d" 
+	-$(RM) "portasm.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 
