@@ -10,6 +10,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "status_led.h"
+#include "lcd.h"
 
 #define USERTASK_STACK_SIZE configMINIMAL_STACK_SIZE
 #define IDLE_PRIO 0
@@ -34,7 +35,16 @@ static void setupHardware(void)
 int main(void)
 {
     setupHardware();
+    init_lcd();
+    print_lcd("Welcome");
+
     xTaskCreate( status_led_task, "Status_led", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL );
+    xTaskCreate( lcd_task, "LCD", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL );
+
     vTaskStartScheduler();
-	return 0;
+
+	while(1){
+	    // Write to the LCD
+
+	}
 }

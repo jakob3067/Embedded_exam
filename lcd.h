@@ -19,4 +19,6 @@ void data_lcd(unsigned char data);
 
 void command_lcd(unsigned char command);
 
+void lcd_task(void *pvParameters);
+
 #endif

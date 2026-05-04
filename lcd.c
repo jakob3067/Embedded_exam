@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include "tm4c123gh6pm.h"
 #include "lcd.h"
+#include "FreeRTOS.h"
+#include "task.h"
 
 void init_portF(void){
     SYSCTL_RCGCGPIO_R |= 0x20; 
@@ -76,7 +78,7 @@ void data_lcd(unsigned char data){
     delay(1);
     GPIO_PORTD_DATA_R &= ~0x80; // EN = 0
 
-    GPIO_PORTC_DATA_R = (GPIO_PORTC_DATA_R & 0xF0) | ((data << 4));
+    GPIO_PORTC_DATA_R = (GPIO_PORTC_DATA_R & 0xF0) | ((data << 4) & 0xF0);
     GPIO_PORTD_DATA_R |= 0x40;  // RS = 1 for DATA
     GPIO_PORTD_DATA_R |= 0x80;  // EN = 1
     delay(1);
@@ -91,7 +93,7 @@ void command_lcd(unsigned char command){
     GPIO_PORTD_DATA_R &= ~0x80; // EN = 0
     delay(1);
 
-    GPIO_PORTC_DATA_R = (GPIO_PORTC_DATA_R & 0xF0) | ((command << 4)); // Send lower nibble
+    GPIO_PORTC_DATA_R = (GPIO_PORTC_DATA_R & 0xF0) | ((command << 4) & 0xF0); // Send lower nibble
     GPIO_PORTD_DATA_R &= ~0x40; // RS = 0 for command
     GPIO_PORTD_DATA_R |= 0x80; // EN = 1
     delay(1);
@@ -99,7 +101,16 @@ void command_lcd(unsigned char command){
     delay(1);
 }
 
+void lcd_task(void *pvParameters)
+{
+    print_lcd("Welcome");
+    while(1)
+    {
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
+
 void clear_lcd(void){
     command_lcd(0x01); // Clear display
-    delay(5); // Delay for clear command
+    delay(5);; // Delay for clear command
 }
