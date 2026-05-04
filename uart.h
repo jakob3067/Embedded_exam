@@ -1,8 +1,8 @@
 /*****************************************************************************
 * University of Southern Denmark
-* Embedded C Programming (ECP)
+* Embedded Programming (EMP)
 *
-* MODULENAME.: status led.h
+* MODULENAME.: uart.h
 *
 * PROJECT....: EMP
 *
@@ -13,12 +13,12 @@
 * Date    Id    Change
 * YYMMDD
 * --------------------
-* 100408  KHA    Module created.
+* 150228  MoH   Module created.
 *
 *****************************************************************************/
 
-#ifndef _STATUS_LED_H
-  #define _STATUS_LED_H
+#ifndef _UART_H
+  #define _UART_H
 
 /***************************** Include files *******************************/
 
@@ -27,13 +27,19 @@
 /*****************************   Constants   *******************************/
 
 /*****************************   Functions   *******************************/
+BOOLEAN uart0_put_q( INT8U );
+BOOLEAN uart0_get_q( INT8U* );
+
+void uart_tx_task(INT8U my_id, INT8U my_state, INT8U event, INT8U data);
+void uart_rx_task(INT8U my_id, INT8U my_state, INT8U event, INT8U data);
 
 
-void status_led_init(void);
-
-void status_led_task(void *pvParameters);
-
-void status_led_task_2(void *pvParameters);
+extern void uart0_init( INT32U, INT8U, INT8U, INT8U );
+/*****************************************************************************
+*   Input    : -
+*   Output   : -
+*   Function : Initialize uart 0
+******************************************************************************/
 
 
 /****************************** End Of Module *******************************/
