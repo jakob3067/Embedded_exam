@@ -2,9 +2,9 @@
 * University of Southern Denmark
 * Embedded C Programming (ECP)
 *
-* MODULENAME.: status led.h
+* MODULENAME.: gpio.h
 *
-* PROJECT....: EMP
+* PROJECT....: ECP
 *
 * DESCRIPTION: Test.
 *
@@ -13,12 +13,12 @@
 * Date    Id    Change
 * YYMMDD
 * --------------------
-* 100408  KHA    Module created.
+* 090215  MoH   Module created.
 *
 *****************************************************************************/
 
-#ifndef _STATUS_LED_H
-  #define _STATUS_LED_H
+#ifndef GPIO_H_
+#define GPIO_H_
 
 /***************************** Include files *******************************/
 
@@ -28,14 +28,13 @@
 
 /*****************************   Functions   *******************************/
 
-
-void status_led_init(void);
-
-void status_led_task(void *pvParameters);
-
-void status_led_task_2(void *pvParameters);
+void init_gpio(void);
+/*****************************************************************************
+*   Input    : -
+*   Output   : -
+*   Function : Test function
+******************************************************************************/
 
 
 /****************************** End Of Module *******************************/
-#endif
-
+#endif /*GPIO_H_*/

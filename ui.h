@@ -1,10 +1,10 @@
 /*****************************************************************************
 * University of Southern Denmark
-* Embedded C Programming (ECP)
+* Embedded Programming (EMP)
 *
-* MODULENAME.: leds.h
+* MODULENAME.: ui.h
 *
-* PROJECT....: ECP
+* PROJECT....: EMP
 *
 * DESCRIPTION: Test.
 *
@@ -17,30 +17,26 @@
 *
 *****************************************************************************/
 
-#ifndef _LCD_H
-  #define _LCD_H
+#ifndef _UI_H
+  #define _UI_H
 
 /***************************** Include files *******************************/
 
 /*****************************    Defines    *******************************/
-// Special ASCII characters
-// ------------------------
 
-#define LF		0x0A
-#define FF		0x0C
-#define CR		0x0D
-
-#define ESC		0x1B
-
+/********************** External declaration of Variables ******************/
 
 /*****************************   Constants   *******************************/
 
-/*****************************   Functions   *******************************/
-void wr_str_LCD( INT8U* );
-void move_LCD( INT8U, INT8U );
-INT8U wr_ch_LCD( INT8U Ch );
+/*************************  Function interfaces ****************************/
 
-void lcd_task(INT8U, INT8U, INT8U, INT8U);
+void ui_task(INT8U, INT8U, INT8U, INT8U);
+/*****************************************************************************
+*   Input    : -
+*   Output   : -
+*   Function : Test function
+******************************************************************************/
+void ui_key_task(INT8U, INT8U, INT8U, INT8U);
 /*****************************************************************************
 *   Input    : -
 *   Output   : -

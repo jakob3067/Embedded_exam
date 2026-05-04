@@ -30,6 +30,7 @@ static void setupHardware(void)
   // Warning: If you do not initialize the hardware clock, the timings will be inaccurate
   init_systick();
   status_led_init();
+  init_gpio();
 }
 
 int main(void)

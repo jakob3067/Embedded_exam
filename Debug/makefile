@@ -10,17 +10,25 @@ GEN_OPTS__FLAG :=
 GEN_CMDS__FLAG := 
 
 ORDERED_OBJS += \
+"./file.obj" \
+"./gpio.obj" \
 "./heap_2.obj" \
+"./key.obj" \
 "./lcd.obj" \
 "./list.obj" \
 "./main.obj" \
 "./port.obj" \
 "./portasm.obj" \
 "./queue.obj" \
+"./rtc.obj" \
+"./rtcs.obj" \
 "./startup_frt.obj" \
 "./status_led.obj" \
+"./string.obj" \
 "./systick_frt.obj" \
 "./tasks.obj" \
+"./uart.obj" \
+"./ui.obj" \
 "../tm4c123gh6pm.cmd" \
 $(GEN_CMDS__FLAG) \
 -llibc.a \
@@ -151,8 +159,8 @@ Embedded_exam.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)
-	-$(RM) "heap_2.obj" "lcd.obj" "list.obj" "main.obj" "port.obj" "portasm.obj" "queue.obj" "startup_frt.obj" "status_led.obj" "systick_frt.obj" "tasks.obj" 
-	-$(RM) "heap_2.d" "lcd.d" "list.d" "main.d" "port.d" "queue.d" "startup_frt.d" "status_led.d" "systick_frt.d" "tasks.d" 
+	-$(RM) "file.obj" "gpio.obj" "heap_2.obj" "key.obj" "lcd.obj" "list.obj" "main.obj" "port.obj" "portasm.obj" "queue.obj" "rtc.obj" "rtcs.obj" "startup_frt.obj" "status_led.obj" "string.obj" "systick_frt.obj" "tasks.obj" "uart.obj" "ui.obj" 
+	-$(RM) "file.d" "gpio.d" "heap_2.d" "key.d" "lcd.d" "list.d" "main.d" "port.d" "queue.d" "rtc.d" "rtcs.d" "startup_frt.d" "status_led.d" "string.d" "systick_frt.d" "tasks.d" "uart.d" "ui.d" 
 	-$(RM) "portasm.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
