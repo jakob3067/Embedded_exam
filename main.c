@@ -7,6 +7,7 @@
 #include "gpio.h"
 #include "queue.h"
 #include "tmodel.h"
+#include "lcd.h"
 
 int main(void)
 {
@@ -16,7 +17,7 @@ int main(void)
     
     // 2. Initialize the software queue (Mandatory!)
     // Make sure Q_OUTPUT is initialized so the pointers aren't null
-    init_queue( Q_OUTPUT ); 
+    queue_open( Q_OUTPUT );
 
     // 3. Queue up your message before entering the loop
     // This puts characters into the buffer, but doesn't show them yet
@@ -37,6 +38,7 @@ int main(void)
         // 5. Add a small manual delay 
         // The LCD needs time between commands. Your wr_ctrl/out functions 
         // have loops, but a small delay here helps stability.
-        for(volatile int i = 0; i < 10000; i++); 
+        volatile int i;
+        for(i = 0; i < 10000000000000000000; i++);
     }
 }

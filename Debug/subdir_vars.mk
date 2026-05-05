@@ -8,138 +8,52 @@ SHELL = cmd.exe
 CMD_SRCS += \
 ../tm4c123gh6pm.cmd 
 
-ASM_SRCS += \
-../portasm.asm 
-
 C_SRCS += \
-../file.c \
 ../gpio.c \
-../heap_2.c \
-../key.c \
 ../lcd.c \
-../list.c \
 ../main.c \
-../port.c \
+../messages.c \
 ../queue.c \
-../rtc.c \
-../rtcs.c \
-../startup_frt.c \
-../status_led.c \
-../string.c \
-../systick_frt.c \
-../tasks.c \
-../uart.c \
-../ui.c 
+../systick.c 
 
 C_DEPS += \
-./file.d \
 ./gpio.d \
-./heap_2.d \
-./key.d \
 ./lcd.d \
-./list.d \
 ./main.d \
-./port.d \
+./messages.d \
 ./queue.d \
-./rtc.d \
-./rtcs.d \
-./startup_frt.d \
-./status_led.d \
-./string.d \
-./systick_frt.d \
-./tasks.d \
-./uart.d \
-./ui.d 
+./systick.d 
 
 OBJS += \
-./file.obj \
 ./gpio.obj \
-./heap_2.obj \
-./key.obj \
 ./lcd.obj \
-./list.obj \
 ./main.obj \
-./port.obj \
-./portasm.obj \
+./messages.obj \
 ./queue.obj \
-./rtc.obj \
-./rtcs.obj \
-./startup_frt.obj \
-./status_led.obj \
-./string.obj \
-./systick_frt.obj \
-./tasks.obj \
-./uart.obj \
-./ui.obj 
-
-ASM_DEPS += \
-./portasm.d 
+./systick.obj 
 
 OBJS__QUOTED += \
-"file.obj" \
 "gpio.obj" \
-"heap_2.obj" \
-"key.obj" \
 "lcd.obj" \
-"list.obj" \
 "main.obj" \
-"port.obj" \
-"portasm.obj" \
+"messages.obj" \
 "queue.obj" \
-"rtc.obj" \
-"rtcs.obj" \
-"startup_frt.obj" \
-"status_led.obj" \
-"string.obj" \
-"systick_frt.obj" \
-"tasks.obj" \
-"uart.obj" \
-"ui.obj" 
+"systick.obj" 
 
 C_DEPS__QUOTED += \
-"file.d" \
 "gpio.d" \
-"heap_2.d" \
-"key.d" \
 "lcd.d" \
-"list.d" \
 "main.d" \
-"port.d" \
+"messages.d" \
 "queue.d" \
-"rtc.d" \
-"rtcs.d" \
-"startup_frt.d" \
-"status_led.d" \
-"string.d" \
-"systick_frt.d" \
-"tasks.d" \
-"uart.d" \
-"ui.d" 
-
-ASM_DEPS__QUOTED += \
-"portasm.d" 
+"systick.d" 
 
 C_SRCS__QUOTED += \
-"../file.c" \
 "../gpio.c" \
-"../heap_2.c" \
-"../key.c" \
 "../lcd.c" \
-"../list.c" \
 "../main.c" \
-"../port.c" \
+"../messages.c" \
 "../queue.c" \
-"../rtc.c" \
-"../rtcs.c" \
-"../startup_frt.c" \
-"../status_led.c" \
-"../string.c" \
-"../systick_frt.c" \
-"../tasks.c" \
-"../uart.c" \
-"../ui.c" 
-
-ASM_SRCS__QUOTED += \
-"../portasm.asm" 
+"../systick.c" 
 
 
