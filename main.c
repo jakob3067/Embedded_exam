@@ -20,16 +20,8 @@ int main(void)
     signal( SEM_RTC_UPDATED );
 
 	while(1){
-		while( !ticks );
 
-		// The following will be executed every 5mS
-		ticks--;
-
-		if( ! --alive_timer )
-		{
-			alive_timer = MILLISEC( 500 );
-			GPIO_PORTD_DATA_R ^= 0x40;
-		}
+		GPIO_PORTD_DATA_R ^= 0x40;
 
 		// Protected operating system mode
 		swt_ctrl();
@@ -41,6 +33,6 @@ int main(void)
 		ajust_rtc_task( TASK_RTC_ADJUST );
 		lcd_task( TASK_LCD );
 	}
-	
+
 	return( 0 );
 }
