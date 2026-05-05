@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include "tm4c123gh6pm.h"
-#include "emp_type.h"
 #include "lcd.h"
+#include "emp_type.h"
 #include "glob_def.h"
 #include "tmodel.h"
 #include "queue.h"
