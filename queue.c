@@ -1,6 +1,6 @@
-#include "queue.h"
 #include "emp_type.h"
 #include "glob_def.h"
+#include "queue.h"
 
 #define QUEUE_SIZE   128
 #define NOF_QUEUES     8

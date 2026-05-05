@@ -2,11 +2,12 @@
 #include "tm4c123gh6pm.h"
 #include "systick_frt.h"
 #include "FreeRTOS.h"
-#include "queue.h"
-#include "tmodel.h"
 #include "glob_def.h"
 #include "emp_type.h"
 #include "gpio.h"
+#include "queue.h"
+#include "tmodel.h"
+
 
 extern volatile INT16S ticks;
 INT16S alive_timer = MILLISEC(500);
