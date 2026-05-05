@@ -8,7 +8,6 @@
 #include "queue.h"
 #include "tmodel.h"
 
-
 extern volatile INT16S ticks;
 INT16S alive_timer = MILLISEC(500);
 
@@ -16,10 +15,6 @@ int main(void)
 {
 	init_systick();
     init_gpio();
-
-	signal( MUTEX_SYSTEM_RTC );
-    signal( MUTEX_LCD_DISPLAY );
-    signal( SEM_RTC_UPDATED );
 
 	while(1){
 
