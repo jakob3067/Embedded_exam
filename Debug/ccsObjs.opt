@@ -3,6 +3,7 @@
 "./main.obj"
 "./messages.obj"
 "./queue.obj"
+"./rtc.obj"
 "./sem.obj"
 "./swtimers.obj"
 "./systick.obj"
