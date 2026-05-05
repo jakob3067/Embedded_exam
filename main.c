@@ -8,9 +8,6 @@
 #include "queue.h"
 #include "tmodel.h"
 
-extern volatile INT16S ticks;
-INT16S alive_timer = MILLISEC(500);
-
 int main(void)
 {
 	init_systick();
