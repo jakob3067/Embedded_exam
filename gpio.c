@@ -1,9 +1,8 @@
 #include <stdint.h>
 #include "tm4c123gh6pm.h"
 #include "emp_type.h"
-#include "gpio.h"
 
-void init_gpio(void)
+void init_gpio_(void)
 {
   int dummy;
   // Enable the GPIO port that is used for the on-board LED.

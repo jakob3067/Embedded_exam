@@ -6,6 +6,7 @@
 #include "tmodel.h"
 #include "glob_def.h"
 #include "emp_type.h"
+#include "gpio.h"
 
 extern volatile INT16S ticks;
 INT16S alive_timer = MILLISEC(500);
