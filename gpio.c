@@ -3,7 +3,7 @@
 #include "emp_type.h"
 #include "gpio.h"
 
-void init_gpio_(void)
+void init_gpio(void)
 {
   int dummy;
   // Enable the GPIO port that is used for the on-board LED.
