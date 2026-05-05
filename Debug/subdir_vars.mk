@@ -14,6 +14,8 @@ C_SRCS += \
 ../main.c \
 ../messages.c \
 ../queue.c \
+../sem.c \
+../swtimers.c \
 ../systick.c 
 
 C_DEPS += \
@@ -22,6 +24,8 @@ C_DEPS += \
 ./main.d \
 ./messages.d \
 ./queue.d \
+./sem.d \
+./swtimers.d \
 ./systick.d 
 
 OBJS += \
@@ -30,6 +34,8 @@ OBJS += \
 ./main.obj \
 ./messages.obj \
 ./queue.obj \
+./sem.obj \
+./swtimers.obj \
 ./systick.obj 
 
 OBJS__QUOTED += \
@@ -38,6 +44,8 @@ OBJS__QUOTED += \
 "main.obj" \
 "messages.obj" \
 "queue.obj" \
+"sem.obj" \
+"swtimers.obj" \
 "systick.obj" 
 
 C_DEPS__QUOTED += \
@@ -46,6 +54,8 @@ C_DEPS__QUOTED += \
 "main.d" \
 "messages.d" \
 "queue.d" \
+"sem.d" \
+"swtimers.d" \
 "systick.d" 
 
 C_SRCS__QUOTED += \
@@ -54,6 +64,8 @@ C_SRCS__QUOTED += \
 "../main.c" \
 "../messages.c" \
 "../queue.c" \
+"../sem.c" \
+"../swtimers.c" \
 "../systick.c" 
 
 

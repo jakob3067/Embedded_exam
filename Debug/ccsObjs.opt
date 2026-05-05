@@ -3,6 +3,8 @@
 "./main.obj"
 "./messages.obj"
 "./queue.obj"
+"./sem.obj"
+"./swtimers.obj"
 "./systick.obj"
 "../tm4c123gh6pm.cmd"
 -llibc.a

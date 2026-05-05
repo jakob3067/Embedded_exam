@@ -15,6 +15,8 @@ ORDERED_OBJS += \
 "./main.obj" \
 "./messages.obj" \
 "./queue.obj" \
+"./sem.obj" \
+"./swtimers.obj" \
 "./systick.obj" \
 "../tm4c123gh6pm.cmd" \
 $(GEN_CMDS__FLAG) \
@@ -146,8 +148,8 @@ Embedded_exam.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)
-	-$(RM) "gpio.obj" "lcd.obj" "main.obj" "messages.obj" "queue.obj" "systick.obj" 
-	-$(RM) "gpio.d" "lcd.d" "main.d" "messages.d" "queue.d" "systick.d" 
+	-$(RM) "gpio.obj" "lcd.obj" "main.obj" "messages.obj" "queue.obj" "sem.obj" "swtimers.obj" "systick.obj" 
+	-$(RM) "gpio.d" "lcd.d" "main.d" "messages.d" "queue.d" "sem.d" "swtimers.d" "systick.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

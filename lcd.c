@@ -99,8 +99,6 @@ void out_LCD_low( INT8U Ch )
   GPIO_PORTC_DATA_R  = temp | ((Ch & 0x0F) << 4);
   GPIO_PORTD_DATA_R |= 0x04;        // Select data mode
   GPIO_PORTD_DATA_R |= 0x08;		// Set E High
-  for( i=0; i<1000; i )
-      i++;
   GPIO_PORTD_DATA_R &= 0xF7;		// Set E Low
 }
 
