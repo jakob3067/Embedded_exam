@@ -21,10 +21,6 @@ int main(void)
 		swt_ctrl();
 
 		// Application mode
-		button_task( TASK_BUTTON );
-		rtc_task( TASK_RTC );
-		display_rtc_task( TASK_RTC_DISPLAY );
-		ajust_rtc_task( TASK_RTC_ADJUST );
 		lcd_task( TASK_LCD );
 	}
 

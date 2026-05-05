@@ -3,7 +3,11 @@
 
 #define FALSE	      0
 #define TRUE        !FALSE
-#define NULL	      ((void *)0)
+
+#ifndef NULL
+  #define NULL	      ((void *)0)
+#endif
+
 #define NEGATIVE    0
 #define POSITIVE    1
 #define LEFT        0
