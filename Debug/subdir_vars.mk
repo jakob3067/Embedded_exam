@@ -1,0 +1,89 @@
+################################################################################
+# Automatically-generated file. Do not edit!
+################################################################################
+
+SHELL = cmd.exe
+
+# Add inputs and outputs from these tool invocations to the build variables 
+CMD_SRCS += \
+../tm4c123gh6pm.cmd 
+
+C_SRCS += \
+../button.c \
+../gpio.c \
+../lcd.c \
+../main.c \
+../messages.c \
+../rtc.c \
+../sem.c \
+../swtimers.c \
+../systick.c \
+C:/Users/povlj/Downloads/frt10/src/tasks.c \
+../tm4c123gh6pm_startup_ccs.c 
+
+C_DEPS += \
+./button.d \
+./gpio.d \
+./lcd.d \
+./main.d \
+./messages.d \
+./rtc.d \
+./sem.d \
+./swtimers.d \
+./systick.d \
+./tasks.d \
+./tm4c123gh6pm_startup_ccs.d 
+
+OBJS += \
+./button.obj \
+./gpio.obj \
+./lcd.obj \
+./main.obj \
+./messages.obj \
+./rtc.obj \
+./sem.obj \
+./swtimers.obj \
+./systick.obj \
+./tasks.obj \
+./tm4c123gh6pm_startup_ccs.obj 
+
+OBJS__QUOTED += \
+"button.obj" \
+"gpio.obj" \
+"lcd.obj" \
+"main.obj" \
+"messages.obj" \
+"rtc.obj" \
+"sem.obj" \
+"swtimers.obj" \
+"systick.obj" \
+"tasks.obj" \
+"tm4c123gh6pm_startup_ccs.obj" 
+
+C_DEPS__QUOTED += \
+"button.d" \
+"gpio.d" \
+"lcd.d" \
+"main.d" \
+"messages.d" \
+"rtc.d" \
+"sem.d" \
+"swtimers.d" \
+"systick.d" \
+"tasks.d" \
+"tm4c123gh6pm_startup_ccs.d" 
+
+C_SRCS__QUOTED += \
+"../button.c" \
+"../gpio.c" \
+"../lcd.c" \
+"../main.c" \
+"../messages.c" \
+"../rtc.c" \
+"../sem.c" \
+"../swtimers.c" \
+"../systick.c" \
+"C:/Users/povlj/Downloads/frt10/src/tasks.c" \
+"../tm4c123gh6pm_startup_ccs.c" 
+
+
