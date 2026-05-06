@@ -14,11 +14,11 @@ C_SRCS += \
 ../lcd.c \
 ../main.c \
 ../messages.c \
+../queue.c \
 ../rtc.c \
 ../sem.c \
 ../swtimers.c \
 ../systick.c \
-C:/Users/povlj/Downloads/frt10/src/tasks.c \
 ../tm4c123gh6pm_startup_ccs.c 
 
 C_DEPS += \
@@ -27,11 +27,11 @@ C_DEPS += \
 ./lcd.d \
 ./main.d \
 ./messages.d \
+./queue.d \
 ./rtc.d \
 ./sem.d \
 ./swtimers.d \
 ./systick.d \
-./tasks.d \
 ./tm4c123gh6pm_startup_ccs.d 
 
 OBJS += \
@@ -40,11 +40,11 @@ OBJS += \
 ./lcd.obj \
 ./main.obj \
 ./messages.obj \
+./queue.obj \
 ./rtc.obj \
 ./sem.obj \
 ./swtimers.obj \
 ./systick.obj \
-./tasks.obj \
 ./tm4c123gh6pm_startup_ccs.obj 
 
 OBJS__QUOTED += \
@@ -53,11 +53,11 @@ OBJS__QUOTED += \
 "lcd.obj" \
 "main.obj" \
 "messages.obj" \
+"queue.obj" \
 "rtc.obj" \
 "sem.obj" \
 "swtimers.obj" \
 "systick.obj" \
-"tasks.obj" \
 "tm4c123gh6pm_startup_ccs.obj" 
 
 C_DEPS__QUOTED += \
@@ -66,11 +66,11 @@ C_DEPS__QUOTED += \
 "lcd.d" \
 "main.d" \
 "messages.d" \
+"queue.d" \
 "rtc.d" \
 "sem.d" \
 "swtimers.d" \
 "systick.d" \
-"tasks.d" \
 "tm4c123gh6pm_startup_ccs.d" 
 
 C_SRCS__QUOTED += \
@@ -79,11 +79,11 @@ C_SRCS__QUOTED += \
 "../lcd.c" \
 "../main.c" \
 "../messages.c" \
+"../queue.c" \
 "../rtc.c" \
 "../sem.c" \
 "../swtimers.c" \
 "../systick.c" \
-"C:/Users/povlj/Downloads/frt10/src/tasks.c" \
 "../tm4c123gh6pm_startup_ccs.c" 
 
 

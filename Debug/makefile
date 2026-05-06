@@ -15,20 +15,12 @@ ORDERED_OBJS += \
 "./lcd.obj" \
 "./main.obj" \
 "./messages.obj" \
+"./queue.obj" \
 "./rtc.obj" \
 "./sem.obj" \
 "./swtimers.obj" \
 "./systick.obj" \
-"./tasks.obj" \
 "./tm4c123gh6pm_startup_ccs.obj" \
-"./FreeRTOS_Source/heap_2.obj" \
-"./FreeRTOS_Source/list.obj" \
-"./FreeRTOS_Source/port.obj" \
-"./FreeRTOS_Source/portasm.obj" \
-"./FreeRTOS_Source/queue.obj" \
-"./FreeRTOS_Source/startup_frt.obj" \
-"./FreeRTOS_Source/systick_frt.obj" \
-"./FreeRTOS_Source/tasks.obj" \
 "../tm4c123gh6pm.cmd" \
 $(GEN_CMDS__FLAG) \
 -llibc.a \
@@ -41,9 +33,7 @@ RMDIR := RMDIR /S/Q
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include subdir_vars.mk
--include FreeRTOS_Source/subdir_vars.mk
 -include subdir_rules.mk
--include FreeRTOS_Source/subdir_rules.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -140,30 +130,29 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXE_OUTPUTS += \
-Assignment3_solution.out 
+Assignment3EmbeddedExam.out 
 
 EXE_OUTPUTS__QUOTED += \
-"Assignment3_solution.out" 
+"Assignment3EmbeddedExam.out" 
 
 
 # All Target
 all: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
-	@$(MAKE) --no-print-directory -Onone "Assignment3_solution.out"
+	@$(MAKE) --no-print-directory -Onone "Assignment3EmbeddedExam.out"
 
 # Tool invocations
-Assignment3_solution.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
+Assignment3EmbeddedExam.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: Arm Linker'
-	"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"Assignment3_solution.map" --heap_size=0 --stack_size=512 -i"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/lib" -i"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="Assignment3_solution_linkInfo.xml" --rom_model -o "Assignment3_solution.out" $(ORDERED_OBJS)
+	"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"Assignment3EmbeddedExam.map" --heap_size=0 --stack_size=512 -i"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/lib" -i"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="Assignment3EmbeddedExam_linkInfo.xml" --rom_model -o "Assignment3EmbeddedExam.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)
-	-$(RM) "button.obj" "gpio.obj" "lcd.obj" "main.obj" "messages.obj" "rtc.obj" "sem.obj" "swtimers.obj" "systick.obj" "tasks.obj" "tm4c123gh6pm_startup_ccs.obj" "FreeRTOS_Source\heap_2.obj" "FreeRTOS_Source\list.obj" "FreeRTOS_Source\port.obj" "FreeRTOS_Source\portasm.obj" "FreeRTOS_Source\queue.obj" "FreeRTOS_Source\startup_frt.obj" "FreeRTOS_Source\systick_frt.obj" "FreeRTOS_Source\tasks.obj" 
-	-$(RM) "button.d" "gpio.d" "lcd.d" "main.d" "messages.d" "rtc.d" "sem.d" "swtimers.d" "systick.d" "tasks.d" "tm4c123gh6pm_startup_ccs.d" "FreeRTOS_Source\heap_2.d" "FreeRTOS_Source\list.d" "FreeRTOS_Source\port.d" "FreeRTOS_Source\queue.d" "FreeRTOS_Source\startup_frt.d" "FreeRTOS_Source\systick_frt.d" "FreeRTOS_Source\tasks.d" 
-	-$(RM) "FreeRTOS_Source\portasm.d" 
+	-$(RM) "button.obj" "gpio.obj" "lcd.obj" "main.obj" "messages.obj" "queue.obj" "rtc.obj" "sem.obj" "swtimers.obj" "systick.obj" "tm4c123gh6pm_startup_ccs.obj" 
+	-$(RM) "button.d" "gpio.d" "lcd.d" "main.d" "messages.d" "queue.d" "rtc.d" "sem.d" "swtimers.d" "systick.d" "tm4c123gh6pm_startup_ccs.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 
