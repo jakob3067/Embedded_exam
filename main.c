@@ -13,6 +13,8 @@
 #include "rtc.h"
 #include "lcd.h"
 
+// TEst
+
 extern volatile INT16S ticks;
 INT16S alive_timer = MILLISEC(500);
 

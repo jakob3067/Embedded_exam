@@ -29,6 +29,12 @@
 #define TASK_SW_TIMERS   11
 #define TASK_MAIN        12
 #define TASK_BUTTON      13
+#define TASK_UI          14
+#define TASK_CASH        15
+#define TASK_CARD        16
+#define TASK_BREW        17
+#define TASK_ENCODER     18
+#define TASK_UART_LOG    19
 
 
 // Interrupt Service Routines.
@@ -37,11 +43,18 @@
 
 // Shared State Memory.
 // --------------------
-
-
 #define SSM_RTC_SEC            31
 #define SSM_RTC_MIN            32
 #define SSM_RTC_HOUR           33
+
+#define SSM_SELECTED_PRODUCT   50   // 0=espresso, 1=latte, 2=filter
+#define SSM_PAYMENT_METHOD     51   // 0=cash, 1=card
+#define SSM_PRICE_ESPRESSO     52
+#define SSM_PRICE_LATTE        53
+#define SSM_PRICE_FILTER       54   // price per cl
+
+#define SSM_CASH_BALANCE       55   // balance inserted in øre
+#define SSM_CASH_TARGET        56
 
 // Shared Event Buffers.
 // ---------------------
@@ -49,6 +62,11 @@
 #define SEB_TO_BUTTON 42 // Time Out
 #define SEB_TO_TRAFFIC_LIGHT 43 // Time Out
 #define SEB_TO_RTC 44 // Time Out
+
+#define SEB_ENCODER_EVENT      60   // CW=+20, CCW=+5
+#define SEB_UI_EVENT           61   // product/payment chosen
+#define SEB_PAYMENT_DONE       62   // triggers brew task
+#define SEB_BREW_DONE          63   // triggers logging
 
 // Semaphores
 // ----------
@@ -75,5 +93,11 @@
 #define ST_BUTTON   1
 #define ST_RTC      2
 #define ST_TLIGHT   3
+
+#define ST_BREW_GRIND    10
+#define ST_BREW_BREW     11
+#define ST_BREW_FROTH    12
+#define ST_FILTER_FLOW   13
+#define ST_FILTER_IDLE   14
 
 #endif /* _TMODEL_H_ */
