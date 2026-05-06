@@ -64,7 +64,7 @@ void status_led_task(void *pvParameters)
 	while(1)
 	{
 		// Toggle status led
-	    GPIO_PORTF_DATA_R ^= 0x40;
+	    GPIO_PORTF_DATA_R ^= 0xFB;
 		vTaskDelay(500 / portTICK_RATE_MS); // wait 500 ms.
 	}
 }
@@ -80,7 +80,7 @@ void status_led_task_2(void *pvParameters)
     {
         // Toggle status led
         GPIO_PORTD_DATA_R ^= 0x40;
-        vTaskDelay(500 / portTICK_RATE_MS); // wait 500 ms.
+        vTaskDelay(1000 / portTICK_RATE_MS); // wait 500 ms.
     }
 }
 /****************************** End Of Module *******************************/
