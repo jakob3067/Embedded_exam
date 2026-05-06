@@ -1,2 +1,0 @@
-# Embedded_exam
-Yes
