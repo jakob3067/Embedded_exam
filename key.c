@@ -73,9 +73,4 @@ void key_task(void *pvParameters)
   INT8U key_val;
   (void)pvParameters;
 
-  // Read the keyboard (debugging)
-
-
-  // Write to lcd
-
 }

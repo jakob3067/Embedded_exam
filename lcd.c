@@ -249,6 +249,8 @@ void lcd_task(void *pvParameters)
 {
   INT8U init_idx = 0;
   INT8U *pStr = (INT8U *)pvParameters;
+  (void) *pvParameters; /* avoid compiler warning about unused parameter */
+  char msg[] = "LCD Ready";
 
   /* Perform LCD init sequence using vTaskDelay (scheduler must be running) */
   for (init_idx = 0; LCD_init_sequense[init_idx] != 0xFF; init_idx++)
@@ -262,6 +264,15 @@ void lcd_task(void *pvParameters)
   vTaskDelay(pdMS_TO_TICKS(5));
   home_LCD();
   vTaskDelay(pdMS_TO_TICKS(5));
+
+  // Write message directly to LCD hardware
+  pStr = (INT8U *)msg;
+  while(*pStr)
+  {
+      out_LCD(*pStr);
+      vTaskDelay(pdMS_TO_TICKS(20));
+      pStr++;
+  }
 
   /* If a string pointer was passed as pvParameters, print it char-by-char */
   if (pStr != NULL)

@@ -42,9 +42,7 @@ int main(void)
 
     xTaskCreate( status_led_task, "Status_led", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL );
 
-    xTaskCreate(lcd_freertos_task, "LCD", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
-
-
+    xTaskCreate( lcd_task, "LCD", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
 
     vTaskStartScheduler();
 
