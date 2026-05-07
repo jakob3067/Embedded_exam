@@ -31,6 +31,9 @@ static void setupHardware(void)
   init_gpio();
 }
 
+
+
+
 int main(void)
 {
     setupHardware();
@@ -39,9 +42,9 @@ int main(void)
 
     xTaskCreate( status_led_task, "Status_led", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL );
 
-    xTaskCreate( lcd_freertos_task, "LCD", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
+    xTaskCreate(lcd_freertos_task, "LCD", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
 
-    xTaskCreate( key_task, "KEY", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL );
+
 
     vTaskStartScheduler();
 

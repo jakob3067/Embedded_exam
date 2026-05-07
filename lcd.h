@@ -40,20 +40,13 @@ void wr_str_LCD( INT8U* );
 void move_LCD( INT8U, INT8U );
 INT8U wr_ch_LCD( INT8U Ch );
 
-void lcd_task(INT8U, INT8U, INT8U, INT8U);
-/*****************************************************************************
-*   Input    : -
-*   Output   : -
-*   Function : Test function
-******************************************************************************/
 
-void lcd_freertos_task(void *pvParameters);
+void lcd_task(void *pvParameters);
 /*****************************************************************************
 *   Input    : -
 *   Output   : -
 *   Function : FreeRTOS LCD task
 ******************************************************************************/
-
 
 /****************************** End Of Module *******************************/
 #endif

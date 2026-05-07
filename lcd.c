@@ -240,118 +240,45 @@ void out_LCD( INT8U Ch )
   out_LCD_low( Ch );
 }
 
-
-
-void lcd_task(INT8U my_id, INT8U my_state, INT8U event, INT8U data)
-/*****************************************************************************
-*   Input    :
-*   Output   :
-*   Function :
-******************************************************************************/
-{
-  INT8U ch;
-
-  switch( my_state )
-  {
-    case LCD_POWER_UP:
-      LCD_init = 0;
-      set_state( LCD_INIT );
-      wait( 100 );
-      break;
-
-    case LCD_INIT:
-      if( LCD_init_sequense[LCD_init] != 0xFF )
-        wr_ctrl_LCD( LCD_init_sequense[LCD_init++] );
-      else
-	  {
-		set_state( LCD_READY );
-        //open_queue( Q_LCD );
-	  }
-	  wait( 100 );
-      break;
-
-    case LCD_READY:
-      if( get_queue( Q_LCD, &ch, WAIT_FOREVER ))
-      {
-        switch( ch )
-        {
-	      case 0xFF:
-	        clr_LCD();
-	        break;
-	      case ESC:
-		    set_state( LCD_ESC_RECEIVED );
-		    break;
-	      default:
-		    out_LCD( ch );
-		}
-	  }
-	  break;
-
-	case LCD_ESC_RECEIVED:
-	  if( get_queue( Q_LCD, &ch, WAIT_FOREVER ))
-	  {
-		if( ch & 0x80 )
-		{
-			Set_cursor( ch );
-		}
-		else
-		{
-		  switch( ch )
-		  {
-		    case '@':
-		    	home_LCD();
-			  break;
-		  }
-        }
-	    set_state( LCD_READY );
-	    wait( 10 );
-      }
-	  break;
-  }
-}
-
-void lcd_freertos_task(void *pvParameters)
+void lcd_task(void *pvParameters)
 /*****************************************************************************
 *   Input    : pvParameters (unused)
 *   Output   : -
 *   Function : FreeRTOS LCD task - initializes and runs the LCD display
 ******************************************************************************/
 {
-    INT8U init_idx = 0;
-    INT8U *pStr;
-    char msg[] = "LCD Ready";
-    
-    (void)pvParameters;
-    
-    // Send LCD initialization sequence
-    for(init_idx = 0; LCD_init_sequense[init_idx] != 0xFF; init_idx++)
+  INT8U init_idx = 0;
+  INT8U *pStr = (INT8U *)pvParameters;
+
+  /* Perform LCD init sequence using vTaskDelay (scheduler must be running) */
+  for (init_idx = 0; LCD_init_sequense[init_idx] != 0xFF; init_idx++)
+  {
+    wr_ctrl_LCD(LCD_init_sequense[init_idx]);
+    vTaskDelay(pdMS_TO_TICKS(5));
+  }
+
+  /* Ensure display cleared and cursor home */
+  clr_LCD();
+  vTaskDelay(pdMS_TO_TICKS(5));
+  home_LCD();
+  vTaskDelay(pdMS_TO_TICKS(5));
+
+  /* If a string pointer was passed as pvParameters, print it char-by-char */
+  if (pStr != NULL)
+  {
+    while (*pStr)
     {
-        wr_ctrl_LCD(LCD_init_sequense[init_idx]);
-        vTaskDelay(pdMS_TO_TICKS(100));
+      out_LCD(*pStr);
+      vTaskDelay(pdMS_TO_TICKS(20)); /* allow char to be processed (~20ms) */
+      pStr++;
     }
-    
-    // Clear display
-    clr_LCD();
-    vTaskDelay(pdMS_TO_TICKS(50));
-    
-    // Home cursor
-    home_LCD();
-    vTaskDelay(pdMS_TO_TICKS(50));
-    
-    // Write message directly to LCD hardware
-    pStr = (INT8U *)msg;
-    while(*pStr)
-    {
-        out_LCD(*pStr);
-        vTaskDelay(pdMS_TO_TICKS(20));
-        pStr++;
-    }
-    
-    // Keep task alive
-    while(1)
-    {
-        vTaskDelay(pdMS_TO_TICKS(1000));
-    }
+  }
+
+  /* Keep task alive */
+  while (1)
+  {
+    vTaskDelay(pdMS_TO_TICKS(1000));
+  }
 }
 
 
