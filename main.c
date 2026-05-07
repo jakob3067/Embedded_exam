@@ -28,17 +28,17 @@ static void setupHardware(void)
   init_gpio();
 }
 
+
+
+
 int main(void)
 {
     setupHardware();
+    xTaskCreate( status_led_task_2, "Status_led", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
 
-    xTaskCreate( status_led_task_2, "Status_led", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL );
+    xTaskCreate( status_led_task, "Status_led2", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
 
-    xTaskCreate( status_led_task, "Status_led", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL );
-
-    xTaskCreate(lcd_freertos_task, "LCD", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
-
-
+    xTaskCreate(lcd_task, "LCD", USERTASK_STACK_SIZE, (void *)"What would you", MED_PRIO, NULL);
 
     vTaskStartScheduler();
 
