@@ -20,8 +20,12 @@
 /***************************** Include files *******************************/
 #include <stdint.h>
 #include "tm4c123gh6pm.h"
+#include "FreeRTOS.h"
 #include "emp_type.h"
 #include "tmodel.h"
+#include "task.h"
+#include "queue.h"
+#include "lcd.h"
 
 INT8U row( INT8U y )
 {
@@ -64,43 +68,14 @@ BOOLEAN check_column(INT8U x)
     return 0;
 }
 
-extern void key_task(INT8U my_id, INT8U my_state, INT8U event, INT8U data)
-/*****************************************************************************
-*   Input    :
-*   Output   :
-*   Function :
-******************************************************************************/
+void key_task(void *pvParameters)
 {
-  switch(my_state)
-  {
-  case 0:
-    GPIO_PORTA_DATA_R &= 0xE3;          // Clear the 3 bits for the columns
-    GPIO_PORTA_DATA_R |= 0x10;          // Set the bit for column 1
-    if (check_column(1))                // Check all the rows for column 1, using the function check_column
-    {                                   // If a button press is registered we go to next state so the press is only registered once
-        set_state(1);
-        break;
-    }
-    GPIO_PORTA_DATA_R &= 0xE3;          // Repeat the above for the two other columns
-    GPIO_PORTA_DATA_R |= 0x08;
-    if (check_column(2))
-    {
-        set_state(1);
-        break;
-    }
-    GPIO_PORTA_DATA_R &= 0xE3;
-    GPIO_PORTA_DATA_R |= 0x04;
-    if (check_column(3))
-    {
-        set_state(1);
-        break;
-    }
-    break;
-  case 1:
-    if( !(GPIO_PORTE_DATA_R & 0x0F) )   // We stay here until the button is released so a button press is not counted more than once
-    {
-      set_state( 0 );
-    }
-    break;
-  }
+  INT8U key_val;
+  (void)pvParameters;
+
+  // Read the keyboard (debugging)
+
+
+  // Write to lcd
+
 }

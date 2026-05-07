@@ -6,6 +6,9 @@
 #include "task.h"
 #include "status_led.h"
 #include "lcd.h"
+#include "key.h"
+#include "queue.h"
+#include "gpio.h"
 
 #define USERTASK_STACK_SIZE configMINIMAL_STACK_SIZE
 #define IDLE_PRIO 0
@@ -36,9 +39,9 @@ int main(void)
 
     xTaskCreate( status_led_task, "Status_led", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL );
 
-    xTaskCreate(lcd_freertos_task, "LCD", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
+    xTaskCreate( lcd_freertos_task, "LCD", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
 
-
+    xTaskCreate( key_task, "KEY", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL );
 
     vTaskStartScheduler();
 
