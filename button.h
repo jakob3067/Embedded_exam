@@ -2,7 +2,7 @@
 * University of Southern Denmark
 * Embedded C Programming (ECP)
 *
-* MODULENAME.: leds.h
+* MODULENAME.: button.h
 *
 * PROJECT....: ECP
 *
@@ -13,44 +13,29 @@
 * Date    Id    Change
 * YYMMDD
 * --------------------
-* 050128  KA    Module created.
+* 090215  MoH   Module created.
 *
 *****************************************************************************/
 
-#ifndef _LCD_H
-#define _LCD_H
+#ifndef BUTTON_H_
+#define BUTTON_H_
 
 /***************************** Include files *******************************/
 
 /*****************************    Defines    *******************************/
-// Special ASCII characters
-// ------------------------
-
-#define LF		0x0A
-#define FF		0x0C
-#define CR		0x0D
-
-#define ESC		0x1B
 
 
 /*****************************   Constants   *******************************/
 
 /*****************************   Functions   *******************************/
-void wr_str_LCD( INT8U* );
-void move_LCD( INT8U, INT8U );
-INT8U wr_ch_LCD( INT8U Ch );
-void clr_LCD(void);
-void home_LCD(void);
-void out_LCD(INT8U Ch);
-void Set_cursor(INT8U Ch);
 
-void lcd_task(void *pvParameters);
+void button_task(INT8U);
 /*****************************************************************************
 *   Input    : -
-*   Output   : -
-*   Function : FreeRTOS LCD task
+*   Output   : Button Event
+*   Function : Test function
 ******************************************************************************/
 
-/****************************** End Of Module *******************************/
-#endif
 
+/****************************** End Of Module *******************************/
+#endif /*BUTTON_H_*/

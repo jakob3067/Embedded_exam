@@ -6,9 +6,14 @@
 #include "task.h"
 #include "status_led.h"
 #include "lcd.h"
+<<<<<<< HEAD
 #include "key.h"
 #include "queue.h"
 #include "gpio.h"
+=======
+#include "menu.h"
+#include "coffee.h"
+>>>>>>> c1880bb (add coffee and button press)
 
 #define USERTASK_STACK_SIZE configMINIMAL_STACK_SIZE
 #define IDLE_PRIO 0
@@ -34,15 +39,27 @@ static void setupHardware(void)
 
 
 
+
 int main(void)
 {
+    int g = 2; // 0 for espresso, 1 for latte
+
     setupHardware();
 
+<<<<<<< HEAD
     xTaskCreate( status_led_task_2, "Status_led", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL );
 
     xTaskCreate( status_led_task, "Status_led", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL );
 
     xTaskCreate( lcd_task, "LCD", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
+=======
+    //xTaskCreate( lcd_task, "LCD", USERTASK_STACK_SIZE, NULL, HIGH_PRIO, NULL);
+
+    //xTaskCreate( menu_task, "Menu", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
+
+    xTaskCreate( brew_task, "brew", USERTASK_STACK_SIZE, (void*)g, LOW_PRIO, NULL); //
+
+>>>>>>> c1880bb (add coffee and button press)
 
     vTaskStartScheduler();
 
