@@ -188,7 +188,6 @@ void lcd_task(void *pvParameters)
 {
   INT8U init_idx = 0;
   INT8U *pStr = (INT8U *)pvParameters;
-  INT8U Ch;
 
   /* Perform LCD init sequence using vTaskDelay (scheduler must be running) */
   for (init_idx = 0; LCD_init_sequense[init_idx] != 0xFF; init_idx++)
@@ -198,13 +197,18 @@ void lcd_task(void *pvParameters)
   }
 
   vTaskDelay(pdMS_TO_TICKS(5));
-  xQueueReceive(xLCDQueue, &pStr, portMAX_DELAY);
-  wr_str_LCD(pStr);
+
+
 
   /* Keep task alive */
   while (1)
   {
-    vTaskDelay(pdMS_TO_TICKS(1000));
+   if (xQueueReceive(xLCDQueue, &pStr, portMAX_DELAY) == pdTRUE)
+   {
+       clr_LCD();
+       // Receive and print to LCD
+       wr_str_LCD(pStr);
+   }
   }
 }
 

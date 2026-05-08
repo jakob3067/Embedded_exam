@@ -41,7 +41,7 @@ void brew(int coffee)
         /* Yellow light: grinding */
         GPIO_PORTF_DATA_R &= 0xFB;  /* Yellow on */
         // Write "Grinding" to LCD
-        pStr = (INT8U *)"Grinding\n";
+        pStr = (INT8U *)"Grinding";
         xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
 
         // Duration
@@ -52,7 +52,7 @@ void brew(int coffee)
         /* Red light: brew */
         GPIO_PORTF_DATA_R &= 0xFD;  /* Red on */
         // Write "Brewing" to LCD
-        pStr = (INT8U *)"Brewing\n";
+        pStr = (INT8U *)"Brewing";
         xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
 
         // Duration
@@ -65,7 +65,7 @@ void brew(int coffee)
         /* Yellow light: grinding */
         GPIO_PORTF_DATA_R &= 0xFB;  /* Yellow on */
         // Write "Grinding" to LCD
-        pStr = (INT8U *)"Grinding\n";
+        pStr = (INT8U *)"Grinding";
         xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
 
         // Duration
@@ -75,7 +75,7 @@ void brew(int coffee)
         /* Red light: Brewing */
         GPIO_PORTF_DATA_R &= 0xFD;  /* Red on */
         // Write "Brewing" to LCD
-        pStr = (INT8U *)"Brewing\n";
+        pStr = (INT8U *)"Brewing";
         xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
         
         // Duration
@@ -107,17 +107,21 @@ void brew(int coffee)
             // Rate = 1.45cl/s
 
         }
-
-
-
     }
     else
     {
         /* Error: invalid coffee type */
         GPIO_PORTF_DATA_R |= 0x02;  /* Red on for error */
+        // Write "Invalid" to LCD
+        pStr = (INT8U *)"Invalid";
+        xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
         vTaskDelay(pdMS_TO_TICKS(3000));
+        pStr = (INT8U *)" ";
+        xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
         GPIO_PORTF_DATA_R &= ~0x02; /* Red off */
     }
+    pStr = (INT8U *)"Coffee done";
+    xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
 }
 
 
