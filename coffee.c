@@ -23,6 +23,8 @@
 #define PF0     0       // Bit 0
 #define Yellow  0xFB
 
+extern QueueHandle_t xLCDQueue;
+
 /*****************************   Constants   *******************************/
 
 /*****************************   Variables   *******************************/
@@ -31,47 +33,79 @@
 
 void brew(int coffee)
 {
+    INT8U *pStr;
+
     if (coffee == 0)
     {
-        /* Yellow light: brewing */
+        // Espresso
+        /* Yellow light: grinding */
         GPIO_PORTF_DATA_R &= 0xFB;  /* Yellow on */
+        // Write "Grinding" to LCD
+        pStr = (INT8U *)"Grinding\n";
+        xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+
+        // Duration
         vTaskDelay(pdMS_TO_TICKS(7500));
-        
-        /* Red light: ready */
         GPIO_PORTF_DATA_R |= 0x04; /* Yellow off */
-        GPIO_PORTF_DATA_R &= 0xFD;  /* Red on */
-        vTaskDelay(pdMS_TO_TICKS(14000));
+
         
+        /* Red light: brew */
+        GPIO_PORTF_DATA_R &= 0xFD;  /* Red on */
+        // Write "Brewing" to LCD
+        pStr = (INT8U *)"Brewing\n";
+        xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+
+        // Duration
+        vTaskDelay(pdMS_TO_TICKS(14000));
         GPIO_PORTF_DATA_R |= 0x02; /* Red off */
     }
     else if (coffee == 1)
     {
-        /* Yellow light: brewing */
+        // Latte
+        /* Yellow light: grinding */
         GPIO_PORTF_DATA_R &= 0xFB;  /* Yellow on */
+        // Write "Grinding" to LCD
+        pStr = (INT8U *)"Grinding\n";
+        xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+
+        // Duration
         vTaskDelay(pdMS_TO_TICKS(7500));
-
-        /* Red light: ready */
         GPIO_PORTF_DATA_R |= 0x04; /* Yellow off */
-        GPIO_PORTF_DATA_R &= 0xFD;  /* Red on */
-        vTaskDelay(pdMS_TO_TICKS(14000));
 
+        /* Red light: Brewing */
+        GPIO_PORTF_DATA_R &= 0xFD;  /* Red on */
+        // Write "Brewing" to LCD
+        pStr = (INT8U *)"Brewing\n";
+        xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+        
+        // Duration
+        vTaskDelay(pdMS_TO_TICKS(14000));
         GPIO_PORTF_DATA_R |= 0x02; /* Red off */
+
+        /* Green light: Milk frothing */
         GPIO_PORTF_DATA_R &= 0xF7; /* Green on*/
+        // Write "Milk frothing" to LCD
+
+        // Duration
         vTaskDelay(pdMS_TO_TICKS(6200));
         GPIO_PORTF_DATA_R |= 0x08; /* Green off */
     }
     else if (coffee == 2)
     {
-        while(1)
+        // Filter Coffee
+        while(1) // While "money"
         {
+            /* Yellow light: brewing (for some reason) */
             GPIO_PORTF_DATA_R &= 0xFD;
-            vTaskDelay(pdMS_TO_TICKS(10));
-            if( button_pushed( ))
-            {
-                GPIO_PORTF_DATA_R &= 0xF7;
-                vTaskDelay(pdMS_TO_TICKS(1000));
+            // Write "Brewing" to LCD
 
-            }
+            // Slow start
+            // Rate = 0.6cl/s
+            vTaskDelay(pdMS_TO_TICKS(30));
+
+            // After start
+            // Rate = 1.45cl/s
+
         }
 
 
@@ -89,8 +123,6 @@ void brew(int coffee)
 
 void brew_task(void *pvParameters)
 {
-    int *coffee_type = (int *)pvParameters;
-
     //turns led of when
     GPIO_PORTF_DATA_R |= 0x04;
     vTaskDelay(pdMS_TO_TICKS(100));
@@ -99,7 +131,7 @@ void brew_task(void *pvParameters)
     GPIO_PORTF_DATA_R |= 0x08;
     vTaskDelay(pdMS_TO_TICKS(100));
 
-    brew(coffee_type);
+    brew((int)pvParameters);
 
     vTaskDelete(NULL);
 }

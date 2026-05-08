@@ -2,6 +2,8 @@
 # Automatically-generated file. Do not edit!
 ################################################################################
 
+SHELL = cmd.exe
+
 # Add inputs and outputs from these tool invocations to the build variables 
 CMD_SRCS += \
 ../tm4c123gh6pm.cmd 
@@ -12,6 +14,7 @@ ASM_SRCS += \
 C_SRCS += \
 ../button.c \
 ../coffee.c \
+../controller.c \
 ../file.c \
 ../gpio.c \
 ../heap_2.c \
@@ -35,6 +38,7 @@ C_SRCS += \
 C_DEPS += \
 ./button.d \
 ./coffee.d \
+./controller.d \
 ./file.d \
 ./gpio.d \
 ./heap_2.d \
@@ -58,6 +62,7 @@ C_DEPS += \
 OBJS += \
 ./button.obj \
 ./coffee.obj \
+./controller.obj \
 ./file.obj \
 ./gpio.obj \
 ./heap_2.obj \
@@ -85,6 +90,7 @@ ASM_DEPS += \
 OBJS__QUOTED += \
 "button.obj" \
 "coffee.obj" \
+"controller.obj" \
 "file.obj" \
 "gpio.obj" \
 "heap_2.obj" \
@@ -109,6 +115,7 @@ OBJS__QUOTED += \
 C_DEPS__QUOTED += \
 "button.d" \
 "coffee.d" \
+"controller.d" \
 "file.d" \
 "gpio.d" \
 "heap_2.d" \
@@ -135,6 +142,7 @@ ASM_DEPS__QUOTED += \
 C_SRCS__QUOTED += \
 "../button.c" \
 "../coffee.c" \
+"../controller.c" \
 "../file.c" \
 "../gpio.c" \
 "../heap_2.c" \

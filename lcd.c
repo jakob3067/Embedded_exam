@@ -27,11 +27,14 @@
 #include "FreeRTOS.h"
 #include "task.h"
 //#include "sem.h"
+#include "queue.h"
+#include "coffee.h"
 
 
 /*****************************    Defines    *******************************/
 
 #define QUEUE_LEN   128
+extern QueueHandle_t xLCDQueue;
 
 enum LCD_states
 {
@@ -57,58 +60,31 @@ const INT8U LCD_init_sequense[]=
 }; 
 
 /*****************************   Variables   *******************************/
-//INT8U LCD_buf[QUEUE_LEN];
-//INT8U LCD_buf_head = 0;
-//INT8U LCD_buf_tail = 0;
-//INT8U LCD_buf_len  = 0;
-
 enum LCD_states LCD_state = LCD_POWER_UP;
 INT8U LCD_init;
-
-
+static INT8U Mode4bit = FALSE;
 
 /*****************************   Functions   *******************************/
-INT8U wr_ch_LCD( INT8U Ch )
-/*****************************************************************************
-*   OBSERVE  : LCD_PROC NEEDS 20 mS TO PRINT OUT ONE CHARACTER 
-*   Function : See module specification (.h-file).
-*****************************************************************************/
-{
-  return( put_queue( Q_LCD, Ch, WAIT_FOREVER ));
-}
-
 void wr_str_LCD( INT8U *pStr )
-/*****************************************************************************
-*   Function : See module specification (.h-file).
-*****************************************************************************/
 {
-  while( *pStr )
+  while (*pStr)
   {
-    wr_ch_LCD( *pStr );
-	pStr++;
+    out_LCD(*pStr);
+    vTaskDelay(pdMS_TO_TICKS(20));
+    pStr++;
   }
 }
 
 void move_LCD( INT8U x, INT8U y )
-/*****************************************************************************
-*   Function : See module specification (.h-file).
-*****************************************************************************/
 {
   INT8U Pos;
-
   Pos = y*0x40 + x;
   Pos |= 0x80;
-  wr_ch_LCD( ESC );
-  wr_ch_LCD( Pos );
+  out_LCD( ESC );  // was wr_ch_LCD(ESC)
+  out_LCD( Pos );  // was wr_ch_LCD(Pos)
 }
-//----------------------------
 
 void wr_ctrl_LCD_low( INT8U Ch )
-/*****************************************************************************
-*   Input    : -
-*   Output   : -
-*   Function : Write low part of control data to LCD.
-******************************************************************************/
 {
   INT8U temp;
   volatile int i;
@@ -133,22 +109,11 @@ void wr_ctrl_LCD_low( INT8U Ch )
 }
 
 void wr_ctrl_LCD_high( INT8U Ch )
-/*****************************************************************************
-*   Input    : -
-*   Output   : -
-*   Function : Write high part of control data to LCD.
-******************************************************************************/
 {
   wr_ctrl_LCD_low(( Ch & 0xF0 ) >> 4 );
 }
 
 void out_LCD_low( INT8U Ch )
-/*****************************************************************************
-*   Input    : Mask
-*   Output   : -
-*   Function : Send low part of character to LCD. 
-*              This function works only in 4 bit data mode.
-******************************************************************************/
 {
   INT8U temp;
 	  
@@ -161,66 +126,40 @@ void out_LCD_low( INT8U Ch )
 }
 
 void out_LCD_high( INT8U Ch )
-/*****************************************************************************
-*   Input    : Mask
-*   Output   : -
-*   Function : Send high part of character to LCD. 
-*              This function works only in 4 bit data mode.
-******************************************************************************/
 {
   out_LCD_low((Ch & 0xF0) >> 4);
 }
 
 void wr_ctrl_LCD( INT8U Ch )
-/*****************************************************************************
-*   Input    : -
-*   Output   : -
-*   Function : Write control data to LCD.
-******************************************************************************/
 {
-  static INT8U Mode4bit = FALSE;
   INT16U i;
 
   wr_ctrl_LCD_high( Ch );
   if( Mode4bit )
   {
-	for(i=0; i<1000; i++);
-	wr_ctrl_LCD_low( Ch );
+    for(i=0; i<1000; i++);
+    wr_ctrl_LCD_low( Ch );
   }
   else
   {
-	if( (Ch & 0x30) == 0x20 )
-	  Mode4bit = TRUE;
+    if( (Ch & 0x30) == 0x20 )
+      Mode4bit = TRUE;
   }
 }
 
 void clr_LCD()
-/*****************************************************************************
-*   Input    : -
-*   Output   : -
-*   Function : Clear LCD.
-******************************************************************************/
 {
   wr_ctrl_LCD( 0x01 );
+  vTaskDelay(pdMS_TO_TICKS(5)); /* allow clear to be processed (~5ms) */
 }
 
 
 void home_LCD()
-/*****************************************************************************
-*   Input    : -
-*   Output   : -
-*   Function : Return cursor to the home position.
-******************************************************************************/
 {
   wr_ctrl_LCD( 0x02 );
 }
 
 void Set_cursor( INT8U Ch )
-/*****************************************************************************
-*   Input    : New Cursor position
-*   Output   : -
-*   Function : Place cursor at given position.
-******************************************************************************/
 {
   wr_ctrl_LCD( Ch );
 }
@@ -249,8 +188,7 @@ void lcd_task(void *pvParameters)
 {
   INT8U init_idx = 0;
   INT8U *pStr = (INT8U *)pvParameters;
-  (void) *pvParameters; /* avoid compiler warning about unused parameter */
-  char msg[] = "LCD Ready";
+  INT8U Ch;
 
   /* Perform LCD init sequence using vTaskDelay (scheduler must be running) */
   for (init_idx = 0; LCD_init_sequense[init_idx] != 0xFF; init_idx++)
@@ -259,31 +197,9 @@ void lcd_task(void *pvParameters)
     vTaskDelay(pdMS_TO_TICKS(5));
   }
 
-  /* Ensure display cleared and cursor home */
-  clr_LCD();
   vTaskDelay(pdMS_TO_TICKS(5));
-  home_LCD();
-  vTaskDelay(pdMS_TO_TICKS(5));
-
-  // Write message directly to LCD hardware
-  pStr = (INT8U *)msg;
-  while(*pStr)
-  {
-      out_LCD(*pStr);
-      vTaskDelay(pdMS_TO_TICKS(20));
-      pStr++;
-  }
-
-  /* If a string pointer was passed as pvParameters, print it char-by-char */
-  if (pStr != NULL)
-  {
-    while (*pStr)
-    {
-      out_LCD(*pStr);
-      vTaskDelay(pdMS_TO_TICKS(20)); /* allow char to be processed (~20ms) */
-      pStr++;
-    }
-  }
+  xQueueReceive(xLCDQueue, &pStr, portMAX_DELAY);
+  wr_str_LCD(pStr);
 
   /* Keep task alive */
   while (1)
