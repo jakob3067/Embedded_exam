@@ -24,6 +24,7 @@
 #define Yellow  0xFB
 
 extern QueueHandle_t xLCDQueue;
+extern QueueHandle_t xButtonQueue;
 
 /*****************************   Constants   *******************************/
 
@@ -34,6 +35,7 @@ extern QueueHandle_t xLCDQueue;
 void brew(int coffee)
 {
     INT8U *pStr;
+    INT8U btn_event;
 
     if (coffee == 0)
     {
@@ -41,7 +43,7 @@ void brew(int coffee)
         /* Yellow light: grinding */
         GPIO_PORTF_DATA_R &= 0xFB;  /* Yellow on */
         // Write "Grinding" to LCD
-        pStr = (INT8U *)"Grinding";
+        pStr = (INT8U *)"Grinding...";
         xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
 
         // Duration
@@ -52,12 +54,14 @@ void brew(int coffee)
         /* Red light: brew */
         GPIO_PORTF_DATA_R &= 0xFD;  /* Red on */
         // Write "Brewing" to LCD
-        pStr = (INT8U *)"Brewing";
+        pStr = (INT8U *)"Brewing...";
         xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
 
         // Duration
         vTaskDelay(pdMS_TO_TICKS(14000));
         GPIO_PORTF_DATA_R |= 0x02; /* Red off */
+        pStr = (INT8U *)"Coffee done!";
+        xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
     }
     else if (coffee == 1)
     {
@@ -65,7 +69,7 @@ void brew(int coffee)
         /* Yellow light: grinding */
         GPIO_PORTF_DATA_R &= 0xFB;  /* Yellow on */
         // Write "Grinding" to LCD
-        pStr = (INT8U *)"Grinding";
+        pStr = (INT8U *)"Grinding...";
         xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
 
         // Duration
@@ -75,7 +79,7 @@ void brew(int coffee)
         /* Red light: Brewing */
         GPIO_PORTF_DATA_R &= 0xFD;  /* Red on */
         // Write "Brewing" to LCD
-        pStr = (INT8U *)"Brewing";
+        pStr = (INT8U *)"Brewing...";
         xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
         
         // Duration
@@ -85,27 +89,52 @@ void brew(int coffee)
         /* Green light: Milk frothing */
         GPIO_PORTF_DATA_R &= 0xF7; /* Green on*/
         // Write "Milk frothing" to LCD
+        pStr = (INT8U *)"Milk frothing...";
+        xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
 
         // Duration
         vTaskDelay(pdMS_TO_TICKS(6200));
         GPIO_PORTF_DATA_R |= 0x08; /* Green off */
+        pStr = (INT8U *)"Coffee done!";
+        xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
     }
     else if (coffee == 2)
     {
         // Filter Coffee
+
+        // Write to LCD
+        pStr = (INT8U *)"Press button";
+        xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
         while(1) // While "money"
         {
-            /* Yellow light: brewing (for some reason) */
-            GPIO_PORTF_DATA_R &= 0xFD;
-            // Write "Brewing" to LCD
+            // Check for button press
+            if (xQueueReceive(xButtonQueue, &btn_event, portMAX_DELAY) == pdTRUE)
+            {
+                if( btn_event == 1)
+                {
+                /* Yellow light: brewing (for some reason) */
+                GPIO_PORTF_DATA_R &= 0xFD;
+                // Write "Brewing" to LCD
+                pStr = (INT8U *)"Brewing...";
+                xQueueSend(xLCDQueue, (void *) &pStr, portMAX_DELAY);
 
-            // Slow start
-            // Rate = 0.6cl/s
-            vTaskDelay(pdMS_TO_TICKS(30));
+                // Slow start
+                // Rate = 0.6cl/s
+                vTaskDelay(pdMS_TO_TICKS(30));
 
-            // After start
-            // Rate = 1.45cl/s
+                // After start
+                // Rate = 1.45cl/s
+                }
+                else if( btn_event == 0)
+                {
+                    // Stop brewing
+                    GPIO_PORTF_DATA_R &= ~0xFD; // Red off
+                    pStr = (INT8U *)"Coffee done!";
+                    xQueueSend(xLCDQueue, (void *) &pStr, portMAX_DELAY);
 
+                    break;
+                }
+            }
         }
     }
     else
@@ -120,8 +149,6 @@ void brew(int coffee)
         xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
         GPIO_PORTF_DATA_R &= ~0x02; /* Red off */
     }
-    pStr = (INT8U *)"Coffee done";
-    xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
 }
 
 

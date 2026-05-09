@@ -21,16 +21,20 @@
 #include <stdint.h>
 #include "tm4c123gh6pm.h"
 #include "emp_type.h"
+#include "FreeRTOS.h"
+#include "task.h"
 #include "button.h"
 //#include "swtimers.h"
 #include "tmodel.h"
 //#include "messages.h"
+#include "queue.h"
+
 /*****************************    Defines    *******************************/
-#define BS_IDLE           0
-#define BS_FIRST_PUSH     1
-#define BS_FIRST_RELEASE  2
-#define BS_SECOND_PUSH    3
-#define BS_LONG_PUSH      4
+#define BS_IDLE     0
+#define BS_PUSH     1
+#define BS_RELEASED  2
+
+extern QueueHandle_t xButtonQueue;
 
 /*****************************   Constants   *******************************/
 
@@ -45,82 +49,46 @@ INT8U button_pushed()
   return( !(GPIO_PORTF_DATA_R & 0x01) );
 }
 
-
-
-/*void button_task( INT8U task_no )
-/*****************************************************************************
-*   Input    :
-*   Output   :
-*   Function :
-******************************************************************************
+void button_task(void *pvParameters)
 {
-  static INT8U  button_state = BS_IDLE;
-         INT8U  time_out;
+	INT8U button_state = BS_IDLE;
+	INT8U event = 1;
 
-  time_out = get_msg_event( SEB_TO_BUTTON );
+	while (1){
+		switch( button_state )
+		{
+			case BS_IDLE:
+			    vTaskDelay(pdMS_TO_TICKS(10));
+				if( button_pushed())		// if button pushed
+				{
+					button_state = BS_PUSH;
+				}
+				break;
 
-  switch( button_state )
-  {
-    case BS_IDLE:
-	    if( button_pushed( ))		// if button pushed
-	    {
-        button_state = BS_FIRST_PUSH;
-	      start_swtimer( ST_BUTTON, SEB_TO_BUTTON, MILLISEC(2000) );
-      }
-	    break;
-    case BS_FIRST_PUSH:
-	    if( time_out )			// if timeout
-	    {
-	      button_state = BS_LONG_PUSH;
-	      put_msg_event( SEB_BUTTON_EVENT, BE_LONG_PUSH );
-	    }
-	    else
-	    {
-        if(  !button_pushed( ) )	// if button released
-		    {
-	        button_state = BS_FIRST_RELEASE;
-	        start_swtimer( ST_BUTTON, SEB_TO_BUTTON, MILLISEC(100) );
-        }
-	    }
-	    break;
-    case BS_FIRST_RELEASE:
-	    if( time_out )			// if timeout
-	    {
-	      button_state = BS_IDLE;
-        put_msg_event( SEB_BUTTON_EVENT, BE_SINGLE_PUSH );
-	    }
-	    else
-	    {
-        if(  button_pushed(  ))		// if button pressed
-		    {
-	        button_state = BS_SECOND_PUSH;
-          start_swtimer( ST_BUTTON, SEB_TO_BUTTON, MILLISEC( 2000 ));
-        }
-	    }
-	    break;
-    case BS_SECOND_PUSH:
-	    if( time_out )			// if timeout
-	    {
-	      button_state = BS_LONG_PUSH;
-        put_msg_event( SEB_BUTTON_EVENT, BE_LONG_PUSH );
-      }
-	    else
-	    {
-        if( ! button_pushed( ) )					// if button released
-		    {
-	        button_state = BS_IDLE;
-	        put_msg_event( SEB_BUTTON_EVENT, BE_DOUBBLE_PUSH );
-        }
-	    }
-	    break;
-    case BS_LONG_PUSH:
-      if( ! button_pushed(  ) )					// if button released
-	      button_state = BS_IDLE;
-	    break;
-    default:
-      break;
-  }
-}*/
+			case BS_PUSH:
+			    event = 1;
+				xQueueSend(xButtonQueue, &event, portMAX_DELAY); // Send button press event to queue
+				vTaskDelay(pdMS_TO_TICKS(200)); // debounce delay
+				while( button_state == BS_PUSH)
+				{
+					if( !button_pushed()) 		// if button released
+					{
+                        button_state = BS_RELEASED;
+                        break;
+					}
+					vTaskDelay(pdMS_TO_TICKS(10));
+				}
+				break;
+
+			case BS_RELEASED:
+				event = 0; // Button release event
+				xQueueSend(xButtonQueue, &event, portMAX_DELAY); // Send button release event to queue
+				vTaskDelay(pdMS_TO_TICKS(200)); // debounce delay
+				button_state = BS_IDLE;
+				break;
+		}
+	}
+}
 
 /****************************** End Of Module *******************************/
 
