@@ -62,6 +62,9 @@ void brew(int coffee)
         GPIO_PORTF_DATA_R |= 0x02; /* Red off */
         pStr = (INT8U *)"Coffee done!";
         xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+
+        // Send coffee type to UART
+        xQueueSend(xUARTQueue, &coffee, portMAX_DELAY);
     }
     else if (coffee == 1)
     {
@@ -97,6 +100,9 @@ void brew(int coffee)
         GPIO_PORTF_DATA_R |= 0x08; /* Green off */
         pStr = (INT8U *)"Coffee done!";
         xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+        
+        // Send coffee type to UART
+        xQueueSend(xUARTQueue, &coffee, portMAX_DELAY);
     }
     else if (coffee == 2)
     {
@@ -132,6 +138,8 @@ void brew(int coffee)
                     pStr = (INT8U *)"Coffee done!";
                     xQueueSend(xLCDQueue, (void *) &pStr, portMAX_DELAY);
 
+                    // Send coffee type to UART
+                    xQueueSend(xUARTQueue, &coffee, portMAX_DELAY);
                     break;
                 }
             }

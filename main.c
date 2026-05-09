@@ -27,6 +27,8 @@
 // Create queues
 QueueHandle_t xLCDQueue;
 QueueHandle_t xButtonQueue;
+QueueHandle_t xUIQueue;
+QueueHandle_t xUARTQueue;
 
 static void setupHardware(void){
   // TODO: Put hardware configuration and initialisation in here
@@ -44,10 +46,11 @@ int main(void)
     setupHardware();
     xLCDQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U *));
     xButtonQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U *));
+    xUARTQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U *));
 
-    xTaskCreate(lcd_task, "lcd", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
+    xTaskCreate( lcd_task, "lcd", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
     xTaskCreate( button_task, "button", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
-    xTaskCreate( brew_task, "brew", USERTASK_STACK_SIZE, (void*)g, LOW_PRIO, NULL); //
+    xTaskCreate( brew_task, "brew", USERTASK_STACK_SIZE, (void*)g, LOW_PRIO, NULL);
 
     vTaskStartScheduler();
 
