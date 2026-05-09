@@ -6,6 +6,8 @@
  */
 /***************************** Include files *******************************/
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "tm4c123gh6pm.h"
 #include "FreeRTOS.h"
 #include "task.h"
@@ -17,6 +19,7 @@
 #include "status_led.h"
 #include "coffee.h"
 #include "button.h"
+#include "uart.h"
 
 
 /*****************************    Defines    *******************************/
@@ -25,6 +28,7 @@
 
 extern QueueHandle_t xLCDQueue;
 extern QueueHandle_t xButtonQueue;
+extern QueueHandle_t xUARTQueue;
 
 /*****************************   Constants   *******************************/
 
@@ -37,9 +41,12 @@ void brew(int coffee)
     INT8U *pStr;
     INT8U btn_event;
 
+
+
     if (coffee == 0)
     {
         // Espresso
+        INT8U coffee_type = coffee;
         /* Yellow light: grinding */
         GPIO_PORTF_DATA_R &= 0xFB;  /* Yellow on */
         // Write "Grinding" to LCD
@@ -64,11 +71,12 @@ void brew(int coffee)
         xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
 
         // Send coffee type to UART
-        xQueueSend(xUARTQueue, &coffee, portMAX_DELAY);
+        xQueueSend(xUARTQueue, &coffee_type, portMAX_DELAY);
     }
     else if (coffee == 1)
     {
         // Latte
+        INT8U coffee_type = coffee;
         /* Yellow light: grinding */
         GPIO_PORTF_DATA_R &= 0xFB;  /* Yellow on */
         // Write "Grinding" to LCD
@@ -102,12 +110,12 @@ void brew(int coffee)
         xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
         
         // Send coffee type to UART
-        xQueueSend(xUARTQueue, &coffee, portMAX_DELAY);
+        xQueueSend(xUARTQueue, &coffee_type, portMAX_DELAY);
     }
     else if (coffee == 2)
     {
         // Filter Coffee
-
+        INT8U coffee_type = coffee;
         // Write to LCD
         pStr = (INT8U *)"Press button";
         xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
@@ -139,7 +147,7 @@ void brew(int coffee)
                     xQueueSend(xLCDQueue, (void *) &pStr, portMAX_DELAY);
 
                     // Send coffee type to UART
-                    xQueueSend(xUARTQueue, &coffee, portMAX_DELAY);
+                    xQueueSend(xUARTQueue, &coffee_type, portMAX_DELAY);
                     break;
                 }
             }

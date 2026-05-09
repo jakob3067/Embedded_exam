@@ -13,7 +13,6 @@
 
 void ui_task(void *pvParameters);
 
-void ui_key_task(void *pvParameters);
 
 /****************************** End Of Module *******************************/
 #endif

@@ -1,13 +1,17 @@
 /***************************** Include files *******************************/
 #include <stdint.h>
+#include <time.h>
 #include "tm4c123gh6pm.h"
 #include "emp_type.h"
+#include "FreeRTOS.h"
 #include "tmodel.h"
 #include "queue.h"
+#include "lcd.h"
 /*****************************    Defines    *******************************/
 
 static char log_buf[128];
 extern QueueHandle_t xUARTQueue;
+extern QueueHandle_t xLCDQueue;
 
 /*****************************   Constants   *******************************/
 
@@ -29,7 +33,7 @@ BOOLEAN uart0_get_q( INT8U *pch )
 
 BOOLEAN uart0_rx_rdy()
 {
-  return( UART0_FR_R & UART_FR_RXFF );
+  return( !(UART0_FR_R & UART_FR_RXFE) );
 }
 
 INT8U uart0_getc()
@@ -113,7 +117,7 @@ void uart0_fifos_disable()
   UART0_LCRH_R  &= 0xFFFFFFEF;
 }
 
-extern void uart0_init( INT32U baud_rate, INT8U databits, INT8U stopbits, INT8U parity )
+void uart0_init( INT32U baud_rate, INT8U databits, INT8U stopbits, INT8U parity )
 {
   INT32U BRD;
 
@@ -128,13 +132,13 @@ extern void uart0_init( INT32U baud_rate, INT8U databits, INT8U stopbits, INT8U 
   #endif
 
   GPIO_PORTA_AFSEL_R |= 0x00000003;
+  GPIO_PORTA_PCTL_R  = (GPIO_PORTA_PCTL_R & 0xFFFFFF00) | 0x00000011;
   GPIO_PORTA_DIR_R   |= 0x00000002;
   GPIO_PORTA_DEN_R   |= 0x00000003;
   GPIO_PORTA_PUR_R   |= 0x00000002;
 
-  BRD = 64000000 / baud_rate;
-  UART0_IBRD_R = BRD / 64;
-  UART0_FBRD_R = BRD & 0x0000003F;
+  UART0_IBRD_R = 16000000  / (16 * baud_rate);
+  UART0_FBRD_R = ((16000000  * 4) / baud_rate) & 0x0000003F;
 
   UART0_LCRH_R  = lcrh_databits( databits );
   UART0_LCRH_R += lcrh_stopbits( stopbits );
@@ -142,23 +146,39 @@ extern void uart0_init( INT32U baud_rate, INT8U databits, INT8U stopbits, INT8U 
 
   uart0_fifos_disable();
 
-  UART0_CTL_R  |= (UART_CTL_UARTEN | UART_CTL_TXE );  // Enable UART
+  UART0_CTL_R |= (UART_CTL_UARTEN | UART_CTL_TXE | UART_CTL_RXE); // Enable UART TX and RX
 }
 
 void uart_log_task(void *pvParameters)
 {
-  char *msg;
+  INT8U coffee_type;
+  INT8U *pStr;
 
   while (1)
   {
     // Read from UART Queue
-    if (xQueueReceive(xUARTQueue, &msg, portMAX_DELAY) == pdTRUE)
+    if (xQueueReceive(xUARTQueue, &coffee_type, portMAX_DELAY) == pdTRUE)
     {
+      char *msg;
+      switch (coffee_type)
+      {
+          case 0: msg = "Product: Espresso | Price: 15 DKK | Amount: 1\r\n"; break;
+          case 1: msg = "Product: Latte | Price: 27 DKK | Amount: 1\r\n";    break;
+          case 2: msg = "Product: Filter Coffee\r\n";                        break;
+      }
+      vTaskDelay(pdMS_TO_TICKS(2000));
+      pStr = (INT8U *)"Logging... ";
+      xQueueSend(xLCDQueue, (void *) &pStr, portMAX_DELAY);
       while (*msg != '\0')
       {
-        uart0_putc((INT8U)*msg);
-        msg++;
+        while (!uart0_tx_rdy())
+        {
+          vTaskDelay(pdMS_TO_TICKS(1));
+        }
+        uart0_putc((INT8U)*msg++);
       }
+      pStr = (INT8U *)"Logging complete ";
+      xQueueSend(xLCDQueue, (void *) &pStr, portMAX_DELAY);
     }
   }
 }

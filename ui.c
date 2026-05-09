@@ -12,6 +12,7 @@
 #include "ui.h"
 #include "rtc.h"
 #include "string.h"
+#include "uart.h"
 /*****************************    Defines    *******************************/
 
 /*****************************   Constants   *******************************/
@@ -26,7 +27,19 @@ INT8U InBuf[128];
 void ui_task(void *pvParameters)
 {
   INT8U ch;
-
+  while (1)
+      {
+          if (uart0_rx_rdy())
+          {
+              ch = uart0_getc();
+              switch (ch)
+              {
+                  case 'r': /* send report */ break;
+                  case 'p': /* set price */   break;
+              }
+          }
+          vTaskDelay(pdMS_TO_TICKS(10));
+      }
 }
 
 /****************************** End Of Module *******************************/

@@ -9,6 +9,8 @@
 #include "lcd.h"
 #include "key.h"
 #include "button.h"
+#include "uart.h"
+#include "ui.h"
 
 #include "queue.h"
 #include "gpio.h"
@@ -31,12 +33,11 @@ QueueHandle_t xUIQueue;
 QueueHandle_t xUARTQueue;
 
 static void setupHardware(void){
-  // TODO: Put hardware configuration and initialisation in here
-
   // Warning: If you do not initialize the hardware clock, the timings will be inaccurate
   init_systick();
   status_led_init();
   init_gpio();
+  uart0_init(115200, 8, 1, 'n');
 }
 
 int main(void)
@@ -46,11 +47,13 @@ int main(void)
     setupHardware();
     xLCDQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U *));
     xButtonQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U *));
-    xUARTQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U *));
+    xUARTQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U));
 
     xTaskCreate( lcd_task, "lcd", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
     xTaskCreate( button_task, "button", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
     xTaskCreate( brew_task, "brew", USERTASK_STACK_SIZE, (void*)g, LOW_PRIO, NULL);
+    xTaskCreate( uart_log_task, "log", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
+    xTaskCreate( ui_task, "ui", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
 
     vTaskStartScheduler();
 
