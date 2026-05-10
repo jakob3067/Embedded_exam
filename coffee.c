@@ -20,6 +20,7 @@
 #include "coffee.h"
 #include "button.h"
 #include "uart.h"
+#include "encoder.h"
 
 /*****************************    Defines    *******************************/
 #define PF0     0       // Bit 0
@@ -28,6 +29,7 @@
 extern QueueHandle_t xLCDQueue;
 extern QueueHandle_t xButtonQueue;
 extern QueueHandle_t xUARTQueue;
+extern QueueHandle_t xEncoderQueue;
 //extern QueueHandle_t xMenuQueue;
 
 /*****************************   Constants   *******************************/
@@ -40,7 +42,9 @@ void brew(int coffee)
 {
     INT8U *pStr;
     INT8U btn_event;
-
+    INT8U *total;
+    INT16U cash;
+    INT8U cash_buffer[20];
 
 
     if (coffee == 0)
@@ -117,8 +121,41 @@ void brew(int coffee)
         // Filter Coffee
         INT8U coffee_type = coffee;
         // Write to LCD
-        pStr = (INT8U *)"Press button";
+        pStr = (INT8U *)"Insert money";
         xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+
+        while(1)
+        {
+            if(xQueueReceive(xEncoderQueue, &total, portMAX_DELAY) == pdTRUE)
+            {
+
+                if(total == 5)
+                {
+                    pStr = (INT8U *)"MONEY!";
+                    xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+                    vTaskDelay(pdMS_TO_TICKS(1000));
+                    pStr = (INT8U *)"5 received";
+                    xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+                }
+                else if(total == 20)
+                {
+                    pStr = (INT8U *)"MONEY!";
+                    xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+                    vTaskDelay(pdMS_TO_TICKS(1000));
+                    pStr = (INT8U *)"20 received";
+                    xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+                }
+//                cash = cash + total;
+//                sprintf((char *)cash_buffer, "Total: %d", cash);
+//                pStr = (INT8U *)cash_buffer;
+//                xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+
+                vTaskDelay(pdMS_TO_TICKS(100));
+            }
+            vTaskDelay(pdMS_TO_TICKS(10));
+        }
+
+
         while(1) // While "money"
         {
             // Check for button press

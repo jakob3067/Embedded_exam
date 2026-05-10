@@ -23,20 +23,44 @@ INT8U encoder_turned_b()
 
 void encoder_task(void *pvParameters)
 {
-    INT8U a;
-    INT8U b;
+    INT8U a = encoder_turned_a();
+    INT8U b = encoder_turned_b();
+    INT8U coin;
+    INT8U total;
     while(1)
     {
-        if(encoder_turned_a())
-        {
-            a++;
-            xQueueSend(xEncoderQueue, (void *) &a, portMAX_DELAY);
-        }
+        INT8U a_new = encoder_turned_a();
+        INT8U b_new = encoder_turned_b();
 
-        else if(encoder_turned_b())
+        if(a == 1 && a_new == 0)
         {
-            b++;
-            xQueueSend(xEncoderQueue, (void *) &b, portMAX_DELAY);
+            if(b_new == 1)
+            {
+                coin = 5;
+            }
+            else
+            {
+                coin = 20;
+            }
+            total = total + coin;
+            xQueueSend(xEncoderQueue, &total, 0);
         }
+        else if(a == 0 && a_new == 1)
+        {
+            if(b_new == 1)
+            {
+                coin = 20;
+            }
+            else
+            {
+                coin = 5;
+            }
+            total = total + coin;
+            xQueueSend(xEncoderQueue, &total, 0);
+        }
+        a = a_new;
+        b = b_new;
+
+        vTaskDelay(pdMS_TO_TICKS(2));
     }
 }

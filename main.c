@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdio.h>
 #include "tm4c123gh6pm.h"
 #include "emp_type.h"
 #include "systick_frt.h"
@@ -12,7 +13,7 @@
 #include "uart.h"
 #include "ui.h"
 #include "rtc.h"
-//#include "encoder.h"
+#include "encoder.h"
 //#include "menu.h"
 #include "coffee.h"
 
@@ -33,7 +34,7 @@ QueueHandle_t xLCDQueue;
 QueueHandle_t xButtonQueue;
 QueueHandle_t xUIQueue;
 QueueHandle_t xUARTQueue;
-//QueueHandle_t xEncoderQueue;
+QueueHandle_t xEncoderQueue;
 //QueueHandle_t xMenuQueue;
 
 static void setupHardware(void){
@@ -53,6 +54,7 @@ int main(void)
     xButtonQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U *));
     xUARTQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U));
     xUIQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U));
+    xEncoderQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U));
     //xMenuQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U));
 
     xTaskCreate( lcd_task, "lcd", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
@@ -61,7 +63,7 @@ int main(void)
     xTaskCreate( uart_log_task, "log", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
     xTaskCreate( ui_task, "ui", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
     xTaskCreate( rtc_task, "rtc", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
-    //xTaskCreate( encoder_task, "encoder", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
+    xTaskCreate( encoder_task, "encoder", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
     //xTaskCreate( menu_task, "menu", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
 
     vTaskStartScheduler();
