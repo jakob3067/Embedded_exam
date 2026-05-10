@@ -21,7 +21,6 @@
 #include "button.h"
 #include "uart.h"
 
-
 /*****************************    Defines    *******************************/
 #define PF0     0       // Bit 0
 #define Yellow  0xFB
@@ -114,6 +113,7 @@ void brew(int coffee)
     }
     else if (coffee == 2)
     {
+<<<<<<< HEAD
         // Filter Coffee
         INT8U coffee_type = coffee;
         // Write to LCD
@@ -152,6 +152,17 @@ void brew(int coffee)
                 }
             }
         }
+=======
+
+        GPIO_PORTF_DATA_R &= 0xFD;
+        vTaskDelay(pdMS_TO_TICKS(10));
+        if( button_pushed( ))
+        {
+            GPIO_PORTF_DATA_R &= 0xF7;
+            vTaskDelay(pdMS_TO_TICKS(1000));
+        }
+
+>>>>>>> 3fe2449 (jfewj)
     }
     else
     {
@@ -170,18 +181,24 @@ void brew(int coffee)
 
 void brew_task(void *pvParameters)
 {
+<<<<<<< HEAD
+=======
+    int coffee_type = (int *)pvParameters;
+
+>>>>>>> 3fe2449 (jfewj)
     //turns led of when
     GPIO_PORTF_DATA_R |= 0x04;
-    vTaskDelay(pdMS_TO_TICKS(100));
+    vTaskDelay(pdMS_TO_TICKS(10));
     GPIO_PORTF_DATA_R |= 0x02;
-    vTaskDelay(pdMS_TO_TICKS(100));
+    vTaskDelay(pdMS_TO_TICKS(10));
     GPIO_PORTF_DATA_R |= 0x08;
-    vTaskDelay(pdMS_TO_TICKS(100));
+    vTaskDelay(pdMS_TO_TICKS(10));
 
     brew((int)pvParameters);
 
     vTaskDelete(NULL);
 }
+
 
 
 

@@ -21,6 +21,7 @@ ORDERED_OBJS += \
 "./list.obj" \
 "./main.obj" \
 "./menu.obj" \
+"./payment.obj" \
 "./port.obj" \
 "./portasm.obj" \
 "./queue.obj" \
@@ -163,8 +164,13 @@ EmbeddedExam.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)
+<<<<<<< HEAD
 	-$(RM) "button.obj" "coffee.obj" "controller.obj" "file.obj" "gpio.obj" "heap_2.obj" "key.obj" "lcd.obj" "list.obj" "main.obj" "menu.obj" "port.obj" "portasm.obj" "queue.obj" "rtc.obj" "rtcs.obj" "startup_frt.obj" "status_led.obj" "string.obj" "systick_frt.obj" "tasks.obj" "uart.obj" "ui.obj" 
 	-$(RM) "button.d" "coffee.d" "controller.d" "file.d" "gpio.d" "heap_2.d" "key.d" "lcd.d" "list.d" "main.d" "menu.d" "port.d" "queue.d" "rtc.d" "rtcs.d" "startup_frt.d" "status_led.d" "string.d" "systick_frt.d" "tasks.d" "uart.d" "ui.d" 
+=======
+	-$(RM) "button.obj" "coffee.obj" "file.obj" "gpio.obj" "heap_2.obj" "key.obj" "lcd.obj" "list.obj" "main.obj" "menu.obj" "payment.obj" "port.obj" "portasm.obj" "queue.obj" "rtc.obj" "rtcs.obj" "startup_frt.obj" "status_led.obj" "string.obj" "systick_frt.obj" "tasks.obj" "uart.obj" "ui.obj" 
+	-$(RM) "button.d" "coffee.d" "file.d" "gpio.d" "heap_2.d" "key.d" "lcd.d" "list.d" "main.d" "menu.d" "payment.d" "port.d" "queue.d" "rtc.d" "rtcs.d" "startup_frt.d" "status_led.d" "string.d" "systick_frt.d" "tasks.d" "uart.d" "ui.d" 
+>>>>>>> 3fe2449 (jfewj)
 	-$(RM) "portasm.d" 
 	-@echo 'Finished clean'
 	-@echo ' '

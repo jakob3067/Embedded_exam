@@ -119,6 +119,12 @@ void key_init(void)
 
 void key_task(void *pvParameters)
 {
+<<<<<<< HEAD
+=======
+  INT8U column;
+  INT8U debounce_count;
+  
+>>>>>>> 3fe2449 (jfewj)
   (void)pvParameters;
   INT8U key_val = 0;
   INT8U col;
@@ -143,4 +149,43 @@ void key_task(void *pvParameters)
       vTaskDelay(pdMS_TO_TICKS(20)); // Polling rate
   }
 
+  /* Continuous keypad scanning */
+  while(1)
+  {
+    /* Scan each of the 3 columns */
+    for(column = 1; column <= 3; column++)
+    {
+      /* Select column by setting the appropriate PORTC bit (4-6) */
+      /* Column 1 = bit 4 (0x10), Column 2 = bit 5 (0x20), Column 3 = bit 6 (0x40) */
+      GPIO_PORTC_DATA_R = (column << 4) & 0xF0;  /* Set column bits, clear others */
+      
+      /* Wait for column to stabilize */
+      vTaskDelay(pdMS_TO_TICKS(5));
+      
+      /* Check if any key in this column is pressed */
+      if(check_column(column))
+      {
+        /* Debounce: wait for key to settle */
+        vTaskDelay(pdMS_TO_TICKS(20));
+        
+        /* Check again to confirm keypress */
+        if(check_column(column))
+        {
+          /* Key confirmed pressed - wait for it to be released */
+          vTaskDelay(pdMS_TO_TICKS(100));
+          
+          /* Wait for key release (all rows inactive) */
+          debounce_count = 0;
+          while((GPIO_PORTE_DATA_R & 0x0F) && debounce_count < 50)
+          {
+            vTaskDelay(pdMS_TO_TICKS(10));
+            debounce_count++;
+          }
+        }
+      }
+      
+      /* Short inter-column delay */
+      vTaskDelay(pdMS_TO_TICKS(10));
+    }
+  }
 }

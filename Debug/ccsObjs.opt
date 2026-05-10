@@ -9,6 +9,7 @@
 "./list.obj"
 "./main.obj"
 "./menu.obj"
+"./payment.obj"
 "./port.obj"
 "./portasm.obj"
 "./queue.obj"
