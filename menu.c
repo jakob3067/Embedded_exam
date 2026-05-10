@@ -15,6 +15,7 @@
 #include "status_led.h"
 #include "menu.h"
 #include "lcd.h"
+#include "coffee.h"
 
 /*****************************    Defines    *******************************/
 #define PF0     0       // Bit 0
@@ -27,6 +28,7 @@
 
 extern QueueHandle_t xMenuQueue;
 extern QueueHandle_t xLCDQueue;
+extern QueueHandle_t xKeyQueue;
 
 /*****************************   Constants   *******************************/
 
@@ -37,14 +39,37 @@ extern QueueHandle_t xLCDQueue;
 void menu_task(void *pvParameters)
 {
     INT8U *pStr;
-    pStr = (INT8U *)"Select Item";
+    INT8U coffee_type;
+    INT8U coffee;
+    pStr = (INT8U *)"Welcome";
     xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
 
-
-
-    while(1)
+    if(xQueueReceive(xKeyQueue, &pStr, portMAX_DELAY) == pdTRUE)
     {
-
+        while(1)
+        {
+            if(xQueueReceive(xKeyQueue, &pStr, portMAX_DELAY) == pdTRUE)
+            {
+                if(coffee == 0)
+                {
+                    coffee_type = 0;
+                    xQueueSend(xMenuQueue, &coffee_type, portMAX_DELAY);
+                    break;
+                }
+                else if(coffee == 1)
+                {
+                    coffee_type = 1;
+                    xQueueSend(xMenuQueue, &coffee_type, portMAX_DELAY);
+                    break;
+                }
+                else if(coffee == 2)
+                {
+                    coffee_type = 2;
+                    xQueueSend(xMenuQueue, &coffee_type, portMAX_DELAY);
+                    break;
+                }
+            }
+        }
     }
 }
 

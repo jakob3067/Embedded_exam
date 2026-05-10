@@ -195,11 +195,8 @@ void lcd_task(void *pvParameters)
 {
   INT8U init_idx = 0;
   INT8U *pStr = (INT8U *)pvParameters;
-<<<<<<< HEAD
-=======
   (void) *pvParameters;
   char msg[] = "LCD Ready";
->>>>>>> 3fe2449 (jfewj)
 
   /* Perform LCD init sequence using vTaskDelay (scheduler must be running) */
   for (init_idx = 0; LCD_init_sequense[init_idx] != 0xFF; init_idx++)
