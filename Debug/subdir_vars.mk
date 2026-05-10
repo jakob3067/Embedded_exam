@@ -12,6 +12,9 @@ ASM_SRCS += \
 ../portasm.asm 
 
 C_SRCS += \
+../button.c \
+../coffee.c \
+../controller.c \
 ../file.c \
 ../gpio.c \
 ../heap_2.c \
@@ -19,6 +22,7 @@ C_SRCS += \
 ../lcd.c \
 ../list.c \
 ../main.c \
+../menu.c \
 ../port.c \
 ../queue.c \
 ../rtc.c \
@@ -32,6 +36,9 @@ C_SRCS += \
 ../ui.c 
 
 C_DEPS += \
+./button.d \
+./coffee.d \
+./controller.d \
 ./file.d \
 ./gpio.d \
 ./heap_2.d \
@@ -39,6 +46,7 @@ C_DEPS += \
 ./lcd.d \
 ./list.d \
 ./main.d \
+./menu.d \
 ./port.d \
 ./queue.d \
 ./rtc.d \
@@ -52,6 +60,9 @@ C_DEPS += \
 ./ui.d 
 
 OBJS += \
+./button.obj \
+./coffee.obj \
+./controller.obj \
 ./file.obj \
 ./gpio.obj \
 ./heap_2.obj \
@@ -59,6 +70,7 @@ OBJS += \
 ./lcd.obj \
 ./list.obj \
 ./main.obj \
+./menu.obj \
 ./port.obj \
 ./portasm.obj \
 ./queue.obj \
@@ -76,6 +88,9 @@ ASM_DEPS += \
 ./portasm.d 
 
 OBJS__QUOTED += \
+"button.obj" \
+"coffee.obj" \
+"controller.obj" \
 "file.obj" \
 "gpio.obj" \
 "heap_2.obj" \
@@ -83,6 +98,7 @@ OBJS__QUOTED += \
 "lcd.obj" \
 "list.obj" \
 "main.obj" \
+"menu.obj" \
 "port.obj" \
 "portasm.obj" \
 "queue.obj" \
@@ -97,6 +113,9 @@ OBJS__QUOTED += \
 "ui.obj" 
 
 C_DEPS__QUOTED += \
+"button.d" \
+"coffee.d" \
+"controller.d" \
 "file.d" \
 "gpio.d" \
 "heap_2.d" \
@@ -104,6 +123,7 @@ C_DEPS__QUOTED += \
 "lcd.d" \
 "list.d" \
 "main.d" \
+"menu.d" \
 "port.d" \
 "queue.d" \
 "rtc.d" \
@@ -120,6 +140,9 @@ ASM_DEPS__QUOTED += \
 "portasm.d" 
 
 C_SRCS__QUOTED += \
+"../button.c" \
+"../coffee.c" \
+"../controller.c" \
 "../file.c" \
 "../gpio.c" \
 "../heap_2.c" \
@@ -127,6 +150,7 @@ C_SRCS__QUOTED += \
 "../lcd.c" \
 "../list.c" \
 "../main.c" \
+"../menu.c" \
 "../port.c" \
 "../queue.c" \
 "../rtc.c" \

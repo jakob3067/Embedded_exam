@@ -8,7 +8,7 @@
 #ifndef FILE_H_
 #define FILE_H_
 
-#include "emp_type.h""
+#include "emp_type.h"
 
 typedef INT8U* FILE;
 

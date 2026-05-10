@@ -46,18 +46,25 @@ void init_gpio(void)
   // Do a dummy read to insert a few cycles after enabling the peripheral.
   dummy = SYSCTL_RCGC2_R;
 
+  /* Unlock PF4 and PF0 they are locked by default :(( */
+  GPIO_PORTF_LOCK_R = 0x4C4F434B; /* hvad fuck menere du en magic key for at kunne bruge pf0!!! brugte 3 timer på at fikse det pis før jeg fandt en hemmelig nøgle min røv */
+  GPIO_PORTF_CR_R |= 0x11;
+
   // Set the direction as output (PF1, PF2 and PF3).
   GPIO_PORTA_DIR_R = 0x1C;
   GPIO_PORTC_DIR_R = 0xF0;
   GPIO_PORTD_DIR_R = 0x4C;
-  GPIO_PORTF_DIR_R = 0x0E;
+  GPIO_PORTF_DIR_R = 0x0E;        /* Bits 1,2,3 = output; bits 0,4 = input (buttons) */
 
   // Enable the GPIO pins for digital function (PF0, PF1, PF2, PF3, PF4).
   GPIO_PORTA_DEN_R = 0x1C;
   GPIO_PORTC_DEN_R = 0xF0;
   GPIO_PORTD_DEN_R = 0x4C;
-  GPIO_PORTE_DEN_R = 0x0F;
   GPIO_PORTF_DEN_R = 0x1F;
+
+  GPIO_PORTE_DIR_R = ~0x0F;
+  GPIO_PORTE_DEN_R = 0x0F;
+  GPIO_PORTE_PUR_R = 0x0F;
 
   // Enable internal pull-up (PF0 and PF4).
   GPIO_PORTF_PUR_R = 0x11;

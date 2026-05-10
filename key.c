@@ -19,11 +19,26 @@
 
 /***************************** Include files *******************************/
 #include <stdint.h>
+#include <stdbool.h>
 #include "tm4c123gh6pm.h"
+#include "FreeRTOS.h"
 #include "emp_type.h"
 #include "tmodel.h"
+#include "task.h"
+#include "queue.h"
+#include "lcd.h"
+#include "gpio.h"
+#include "controller.h"
 
-INT8U row( INT8U y )
+/***************************** Defines    *******************************/
+// External queues defined in main
+
+extern QueueHandle_t xLCDQueue;
+extern QueueHandle_t xKeyQueue;
+
+/***************************** Functions   *******************************/
+
+static INT8U row( INT8U y )
 {
   INT8U result = 0;
 
@@ -37,70 +52,95 @@ INT8U row( INT8U y )
   return( result );
 }
 
-INT8U key_catch( x, y )
-INT8U x, y;
+static INT8U key_catch(INT8U x, INT8U y )
 {
   const INT8U matrix[3][4] = {{'*','7','4','1'},
                               {'0','8','5','2'},
                               {'#','9','6','3'}};
 
+  if (x < 1 || x > 3 || y < 1 || y > 4) return 0;
   return( matrix[x-1][y-1] );
+}
+
+void drive_column(INT8U col)
+{
+    GPIO_PORTA_DATA_R |= 0x1C;
+
+    switch(col)
+    {
+        case 1: GPIO_PORTA_DATA_R &= 0x04; break; // PA2
+        case 2: GPIO_PORTA_DATA_R &= 0x08; break; // PA3
+        case 3: GPIO_PORTA_DATA_R &= 0x10; break; // PA4
+    }
 }
 
 BOOLEAN get_keyboard( INT8U *pch )
 {
-  return( get_queue( Q_KEY, pch, WAIT_FOREVER ));
+  return( get_queue( xKeyQueue, pch, 20 ));
 }
 
-BOOLEAN check_column(INT8U x)
+BOOLEAN check_column(INT8U x, INT8U *pressed_key)
 {
-    INT8U y = GPIO_PORTE_DATA_R & 0x0F;             // Save the values of the 4 bits for the rows
+    drive_column(x);
+
+    volatile int i;
+    for(i = 0; i < 100; i++);
+
+    INT8U y = (~GPIO_PORTE_DATA_R) & 0x0F;          // Save the values of the 4 bits for the rows
+
     if( y )                                         // If one of them are set...
     {                                               // ...we first find the row number with the function row()
-        INT8U ch = key_catch( x, row(y) );          // Now that we have the row and column we look up the corresponding character using the function key_catch
-        put_queue( Q_KEY, ch, 1 );                  // Put the character in a queue so it can be used by another task
-        return 1;
+        INT8U r = row(y);
+        if (r > 0)
+        {
+            *pressed_key = key_catch(x, r);
+            return 1;
+        }
     }
     return 0;
 }
 
-extern void key_task(INT8U my_id, INT8U my_state, INT8U event, INT8U data)
-/*****************************************************************************
-*   Input    :
-*   Output   :
-*   Function :
-******************************************************************************/
+void key_init(void)
 {
-  switch(my_state)
+    volatile uint32_t dummy;
+    // 1. Enable Clocks for Port A (Columns) and Port E (Rows)
+    SYSCTL_RCGC2_R |= (SYSCTL_RCGC2_GPIOA | SYSCTL_RCGC2_GPIOE);
+    dummy = SYSCTL_RCGC2_R; // Allow time for clocks to stabilize
+
+    // 2. Configure Port A (PA2, PA3, PA4) as Outputs for Columns
+    GPIO_PORTA_DIR_R |= 0x1C;
+    GPIO_PORTA_DEN_R |= 0x1C;
+
+    // 3. Configure Port E (PE0, PE1, PE2, PE3) as Inputs for Rows
+    GPIO_PORTE_DIR_R &= ~0x0F;
+    GPIO_PORTE_DEN_R |= 0x0F;
+    GPIO_PORTE_PDR_R |= 0x0F; // Enable Pull-down resistors to avoid floating pins
+}
+
+void key_task(void *pvParameters)
+{
+  (void)pvParameters;
+  INT8U key_val = 0;
+  INT8U col;
+
+
+  while(1)
   {
-  case 0:
-    GPIO_PORTA_DATA_R &= 0xE3;          // Clear the 3 bits for the columns
-    GPIO_PORTA_DATA_R |= 0x10;          // Set the bit for column 1
-    if (check_column(1))                // Check all the rows for column 1, using the function check_column
-    {                                   // If a button press is registered we go to next state so the press is only registered once
-        set_state(1);
-        break;
-    }
-    GPIO_PORTA_DATA_R &= 0xE3;          // Repeat the above for the two other columns
-    GPIO_PORTA_DATA_R |= 0x08;
-    if (check_column(2))
-    {
-        set_state(1);
-        break;
-    }
-    GPIO_PORTA_DATA_R &= 0xE3;
-    GPIO_PORTA_DATA_R |= 0x04;
-    if (check_column(3))
-    {
-        set_state(1);
-        break;
-    }
-    break;
-  case 1:
-    if( !(GPIO_PORTE_DATA_R & 0x0F) )   // We stay here until the button is released so a button press is not counted more than once
-    {
-      set_state( 0 );
-    }
-    break;
+      for(col = 1; col <= 3; col++)
+      {
+          if( check_column(col, &key_val) )
+          {
+              // FreeRTOS queue system
+              xQueueSend( xKeyQueue, &key_val, 0);
+
+              vTaskDelay(pdMS_TO_TICKS(250));
+
+              GPIO_PORTF_DATA_R &= ~0xFD;
+              vTaskDelay(pdMS_TO_TICKS(2050));
+              break;
+              }
+      }
+      vTaskDelay(pdMS_TO_TICKS(20)); // Polling rate
   }
+
 }

@@ -18,7 +18,7 @@
 *****************************************************************************/
 
 #ifndef _LCD_H
-  #define _LCD_H
+#define _LCD_H
 
 /***************************** Include files *******************************/
 
@@ -39,14 +39,17 @@
 void wr_str_LCD( INT8U* );
 void move_LCD( INT8U, INT8U );
 INT8U wr_ch_LCD( INT8U Ch );
+void clr_LCD(void);
+void home_LCD(void);
+void out_LCD(INT8U Ch);
+void Set_cursor(INT8U Ch);
 
-void lcd_task(INT8U, INT8U, INT8U, INT8U);
+void lcd_task(void *pvParameters);
 /*****************************************************************************
 *   Input    : -
 *   Output   : -
-*   Function : Test function
+*   Function : FreeRTOS LCD task
 ******************************************************************************/
-
 
 /****************************** End Of Module *******************************/
 #endif

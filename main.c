@@ -1,46 +1,59 @@
-
-
-/**
- * main.c
- */
 #include <stdint.h>
 #include "tm4c123gh6pm.h"
 #include "emp_type.h"
 #include "systick_frt.h"
 #include "FreeRTOS.h"
 #include "task.h"
+
 #include "status_led.h"
 #include "lcd.h"
+#include "key.h"
+#include "button.h"
+#include "uart.h"
+#include "ui.h"
+
+#include "queue.h"
+#include "gpio.h"
+
+#include "menu.h"
+#include "coffee.h"
+
 
 #define USERTASK_STACK_SIZE configMINIMAL_STACK_SIZE
 #define IDLE_PRIO 0
 #define LOW_PRIO  1
 #define MED_PRIO  2
 #define HIGH_PRIO 3
+#define QUEUE_LEN 16
 
-static void setupHardware(void)
-/*****************************************************************************
-*   Input    :  -
-*   Output   :  -
-*   Function :
-*****************************************************************************/
-{
-  // TODO: Put hardware configuration and initialisation in here
+// Create queues
+QueueHandle_t xLCDQueue;
+QueueHandle_t xButtonQueue;
+QueueHandle_t xUIQueue;
+QueueHandle_t xUARTQueue;
 
+static void setupHardware(void){
   // Warning: If you do not initialize the hardware clock, the timings will be inaccurate
   init_systick();
   status_led_init();
   init_gpio();
+  uart0_init(115200, 8, 1, 'n');
 }
 
 int main(void)
 {
-    setupHardware();
-    init_lcd();
-    print_lcd("Welcome");
+    int g = 2; // 0 for espresso, 1 for latte, 2 for filter coffee
 
-    xTaskCreate( status_led_task, "Status_led", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL );
-    xTaskCreate( lcd_task, "LCD", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL );
+    setupHardware();
+    xLCDQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U *));
+    xButtonQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U *));
+    xUARTQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U));
+
+    xTaskCreate( lcd_task, "lcd", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
+    xTaskCreate( button_task, "button", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
+    xTaskCreate( brew_task, "brew", USERTASK_STACK_SIZE, (void*)g, LOW_PRIO, NULL);
+    xTaskCreate( uart_log_task, "log", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
+    xTaskCreate( ui_task, "ui", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
 
     vTaskStartScheduler();
 

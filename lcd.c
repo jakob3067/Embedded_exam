@@ -24,12 +24,17 @@
 #include "lcd.h"
 #include "glob_def.h"
 #include "tmodel.h"
+#include "FreeRTOS.h"
+#include "task.h"
 //#include "sem.h"
+#include "queue.h"
+#include "coffee.h"
 
 
 /*****************************    Defines    *******************************/
 
 #define QUEUE_LEN   128
+extern QueueHandle_t xLCDQueue;
 
 enum LCD_states
 {
@@ -55,58 +60,31 @@ const INT8U LCD_init_sequense[]=
 }; 
 
 /*****************************   Variables   *******************************/
-//INT8U LCD_buf[QUEUE_LEN];
-//INT8U LCD_buf_head = 0;
-//INT8U LCD_buf_tail = 0;
-//INT8U LCD_buf_len  = 0;
-
 enum LCD_states LCD_state = LCD_POWER_UP;
 INT8U LCD_init;
-
-
+static INT8U Mode4bit = FALSE;
 
 /*****************************   Functions   *******************************/
-INT8U wr_ch_LCD( INT8U Ch )
-/*****************************************************************************
-*   OBSERVE  : LCD_PROC NEEDS 20 mS TO PRINT OUT ONE CHARACTER 
-*   Function : See module specification (.h-file).
-*****************************************************************************/
-{
-  return( put_queue( Q_LCD, Ch, WAIT_FOREVER ));
-}
-
 void wr_str_LCD( INT8U *pStr )
-/*****************************************************************************
-*   Function : See module specification (.h-file).
-*****************************************************************************/
 {
-  while( *pStr )
+  while (*pStr)
   {
-    wr_ch_LCD( *pStr );
-	pStr++;
+    out_LCD(*pStr);
+    vTaskDelay(pdMS_TO_TICKS(20));
+    pStr++;
   }
 }
 
 void move_LCD( INT8U x, INT8U y )
-/*****************************************************************************
-*   Function : See module specification (.h-file).
-*****************************************************************************/
 {
   INT8U Pos;
-
   Pos = y*0x40 + x;
   Pos |= 0x80;
-  wr_ch_LCD( ESC );
-  wr_ch_LCD( Pos );
+  out_LCD( ESC );  // was wr_ch_LCD(ESC)
+  out_LCD( Pos );  // was wr_ch_LCD(Pos)
 }
-//----------------------------
 
 void wr_ctrl_LCD_low( INT8U Ch )
-/*****************************************************************************
-*   Input    : -
-*   Output   : -
-*   Function : Write low part of control data to LCD.
-******************************************************************************/
 {
   INT8U temp;
   volatile int i;
@@ -131,22 +109,11 @@ void wr_ctrl_LCD_low( INT8U Ch )
 }
 
 void wr_ctrl_LCD_high( INT8U Ch )
-/*****************************************************************************
-*   Input    : -
-*   Output   : -
-*   Function : Write high part of control data to LCD.
-******************************************************************************/
 {
   wr_ctrl_LCD_low(( Ch & 0xF0 ) >> 4 );
 }
 
 void out_LCD_low( INT8U Ch )
-/*****************************************************************************
-*   Input    : Mask
-*   Output   : -
-*   Function : Send low part of character to LCD. 
-*              This function works only in 4 bit data mode.
-******************************************************************************/
 {
   INT8U temp;
 	  
@@ -159,66 +126,40 @@ void out_LCD_low( INT8U Ch )
 }
 
 void out_LCD_high( INT8U Ch )
-/*****************************************************************************
-*   Input    : Mask
-*   Output   : -
-*   Function : Send high part of character to LCD. 
-*              This function works only in 4 bit data mode.
-******************************************************************************/
 {
   out_LCD_low((Ch & 0xF0) >> 4);
 }
 
 void wr_ctrl_LCD( INT8U Ch )
-/*****************************************************************************
-*   Input    : -
-*   Output   : -
-*   Function : Write control data to LCD.
-******************************************************************************/
 {
-  static INT8U Mode4bit = FALSE;
   INT16U i;
 
   wr_ctrl_LCD_high( Ch );
   if( Mode4bit )
   {
-	for(i=0; i<1000; i++);
-	wr_ctrl_LCD_low( Ch );
+    for(i=0; i<1000; i++);
+    wr_ctrl_LCD_low( Ch );
   }
   else
   {
-	if( (Ch & 0x30) == 0x20 )
-	  Mode4bit = TRUE;
+    if( (Ch & 0x30) == 0x20 )
+      Mode4bit = TRUE;
   }
 }
 
 void clr_LCD()
-/*****************************************************************************
-*   Input    : -
-*   Output   : -
-*   Function : Clear LCD.
-******************************************************************************/
 {
   wr_ctrl_LCD( 0x01 );
+  vTaskDelay(pdMS_TO_TICKS(5)); /* allow clear to be processed (~5ms) */
 }
 
 
 void home_LCD()
-/*****************************************************************************
-*   Input    : -
-*   Output   : -
-*   Function : Return cursor to the home position.
-******************************************************************************/
 {
   wr_ctrl_LCD( 0x02 );
 }
 
 void Set_cursor( INT8U Ch )
-/*****************************************************************************
-*   Input    : New Cursor position
-*   Output   : -
-*   Function : Place cursor at given position.
-******************************************************************************/
 {
   wr_ctrl_LCD( Ch );
 }
@@ -238,73 +179,36 @@ void out_LCD( INT8U Ch )
   out_LCD_low( Ch );
 }
 
-
-
-void lcd_task(INT8U my_id, INT8U my_state, INT8U event, INT8U data)
+void lcd_task(void *pvParameters)
 /*****************************************************************************
-*   Input    :
-*   Output   :
-*   Function :
+*   Input    : pvParameters (unused)
+*   Output   : -
+*   Function : FreeRTOS LCD task - initializes and runs the LCD display
 ******************************************************************************/
 {
-  INT8U ch;
+  INT8U init_idx = 0;
+  INT8U *pStr = (INT8U *)pvParameters;
 
-  switch( my_state )
+  /* Perform LCD init sequence using vTaskDelay (scheduler must be running) */
+  for (init_idx = 0; LCD_init_sequense[init_idx] != 0xFF; init_idx++)
   {
-    case LCD_POWER_UP:
-      LCD_init = 0;
-      set_state( LCD_INIT );
-      wait( 100 );
-      break;
+    wr_ctrl_LCD(LCD_init_sequense[init_idx]);
+    vTaskDelay(pdMS_TO_TICKS(5));
+  }
 
-    case LCD_INIT:
-      if( LCD_init_sequense[LCD_init] != 0xFF )
-        wr_ctrl_LCD( LCD_init_sequense[LCD_init++] );
-      else
-	  {
-		set_state( LCD_READY );
-        //open_queue( Q_LCD );
-	  }
-	  wait( 100 );
-      break;
+  vTaskDelay(pdMS_TO_TICKS(5));
 
-    case LCD_READY:
-      if( get_queue( Q_LCD, &ch, WAIT_FOREVER ))
-      {
-        switch( ch )
-        {
-	      case 0xFF:
-	        clr_LCD();
-	        break;
-	      case ESC:
-		    set_state( LCD_ESC_RECEIVED );
-		    break;
-	      default:
-		    out_LCD( ch );
-		}
-	  }
-	  break;
 
-	case LCD_ESC_RECEIVED:
-	  if( get_queue( Q_LCD, &ch, WAIT_FOREVER ))
-	  {
-		if( ch & 0x80 )
-		{
-			Set_cursor( ch );
-		}
-		else
-		{
-		  switch( ch )
-		  {
-		    case '@':
-		    	home_LCD();
-			  break;
-		  }
-        }
-	    set_state( LCD_READY );
-	    wait( 10 );
-      }
-	  break;
+
+  /* Keep task alive */
+  while (1)
+  {
+   if (xQueueReceive(xLCDQueue, &pStr, portMAX_DELAY) == pdTRUE)
+   {
+       clr_LCD();
+       // Receive and print to LCD
+       wr_str_LCD(pStr);
+   }
   }
 }
 
