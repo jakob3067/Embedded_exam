@@ -1,6 +1,7 @@
 "./button.obj"
 "./coffee.obj"
 "./controller.obj"
+"./encoder.obj"
 "./file.obj"
 "./gpio.obj"
 "./heap_2.obj"

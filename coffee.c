@@ -29,6 +29,7 @@
 extern QueueHandle_t xLCDQueue;
 extern QueueHandle_t xButtonQueue;
 extern QueueHandle_t xUARTQueue;
+extern QueueHandle_t xMenuQueue;
 
 /*****************************   Constants   *******************************/
 
@@ -145,6 +146,8 @@ void brew(int coffee)
                     GPIO_PORTF_DATA_R &= ~0xFD; // Red off
                     pStr = (INT8U *)"Coffee done!";
                     xQueueSend(xLCDQueue, (void *) &pStr, portMAX_DELAY);
+                    // Give time to read LCD
+                    vTaskDelay(pdMS_TO_TICKS(2000));
 
                     // Send coffee type to UART
                     xQueueSend(xUARTQueue, &coffee_type, portMAX_DELAY);
@@ -178,7 +181,9 @@ void brew_task(void *pvParameters)
     GPIO_PORTF_DATA_R |= 0x08;
     vTaskDelay(pdMS_TO_TICKS(100));
 
-    brew((int)pvParameters);
+    volatile int coffee;
+    coffee = xQueueReceive(xMenuQueue, &coffee, portMAX_DELAY);
+    brew(coffee);
 
     vTaskDelete(NULL);
 }

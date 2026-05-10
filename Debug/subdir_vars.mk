@@ -15,6 +15,7 @@ C_SRCS += \
 ../button.c \
 ../coffee.c \
 ../controller.c \
+../encoder.c \
 ../file.c \
 ../gpio.c \
 ../heap_2.c \
@@ -39,6 +40,7 @@ C_DEPS += \
 ./button.d \
 ./coffee.d \
 ./controller.d \
+./encoder.d \
 ./file.d \
 ./gpio.d \
 ./heap_2.d \
@@ -63,6 +65,7 @@ OBJS += \
 ./button.obj \
 ./coffee.obj \
 ./controller.obj \
+./encoder.obj \
 ./file.obj \
 ./gpio.obj \
 ./heap_2.obj \
@@ -91,6 +94,7 @@ OBJS__QUOTED += \
 "button.obj" \
 "coffee.obj" \
 "controller.obj" \
+"encoder.obj" \
 "file.obj" \
 "gpio.obj" \
 "heap_2.obj" \
@@ -116,6 +120,7 @@ C_DEPS__QUOTED += \
 "button.d" \
 "coffee.d" \
 "controller.d" \
+"encoder.d" \
 "file.d" \
 "gpio.d" \
 "heap_2.d" \
@@ -143,6 +148,7 @@ C_SRCS__QUOTED += \
 "../button.c" \
 "../coffee.c" \
 "../controller.c" \
+"../encoder.c" \
 "../file.c" \
 "../gpio.c" \
 "../heap_2.c" \

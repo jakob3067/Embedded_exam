@@ -76,7 +76,7 @@ void drive_column(INT8U col)
 
 BOOLEAN get_keyboard( INT8U *pch )
 {
-  return( get_queue( xKeyQueue, pch, 20 ));
+  //return( get_queue( xKeyQueue, pch, 20 ));
 }
 
 BOOLEAN check_column(INT8U x, INT8U *pressed_key)

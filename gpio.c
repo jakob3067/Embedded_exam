@@ -51,13 +51,13 @@ void init_gpio(void)
   GPIO_PORTF_CR_R |= 0x11;
 
   // Set the direction as output (PF1, PF2 and PF3).
-  GPIO_PORTA_DIR_R = 0x1C;
+  GPIO_PORTA_DIR_R = 0x7C;
   GPIO_PORTC_DIR_R = 0xF0;
   GPIO_PORTD_DIR_R = 0x4C;
   GPIO_PORTF_DIR_R = 0x0E;        /* Bits 1,2,3 = output; bits 0,4 = input (buttons) */
 
   // Enable the GPIO pins for digital function (PF0, PF1, PF2, PF3, PF4).
-  GPIO_PORTA_DEN_R = 0x1C;
+  GPIO_PORTA_DEN_R = 0x7C;
   GPIO_PORTC_DEN_R = 0xF0;
   GPIO_PORTD_DEN_R = 0x4C;
   GPIO_PORTF_DEN_R = 0x1F;

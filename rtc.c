@@ -1,30 +1,14 @@
-/*****************************************************************************
-* University of Southern Denmark
-* Embedded C Programming (ECP)
-*
-* MODULENAME.: rtc.c
-*
-* PROJECT....: ECP
-*
-* DESCRIPTION: See module specification file (.h-file).
-*
-* Change Log:
-******************************************************************************
-* Date    Id    Change
-* YYMMDD
-* --------------------
-* 090926  MoH   Module created.
-*
-*****************************************************************************/
-
-/***************************** Include files *******************************/
 #include "emp_type.h"
+#include "tm4c123gh6pm.h"
+#include "FreeRTOS.h"
 #include "tmodel.h"
+#include "task.h"
 #include "lcd.h"
-#include "file.h"
 
 
 /*****************************    Defines    *******************************/
+
+#define HIB_LOAD_R (*((volatile uint32_t *)0x400FC00C))
 
 /*****************************   Constants   *******************************/
 
@@ -47,62 +31,50 @@ INT8U get_sec()
   return( sec );
 }
 
-void set_hour( INT8U new_hour )
+void rtc_set_time( INT8U h, INT8U m, INT8U s )
 {
-  hour = new_hour;
-}
-void set_min( INT8U new_min )
-{
-  min = new_min;
-}
-void set_sec( INT8U new_sec )
-{
-  sec = new_sec;
+  // Set the real-time clock in seconds
+  INT32U total_seconds = (h * 3600) + (m * 60) + s;
+  while (!(HIB_CTL_R & 0x80000000));
+  HIB_LOAD_R = total_seconds;
+  
 }
 
-void rtc_task(INT8U my_id, INT8U my_state, INT8U event, INT8U data)
-/*****************************************************************************
-*   Input    : -
-*   Output   : -
-*   Function : Disable global interrupt
-******************************************************************************/
+void rtc_task(void *pvParameters)
 {
-  switch( my_state )
+  volatile INT32U i;
+
+  SYSCTL_RCGCHIB_R |= 0x01; // Enable clock to Hibernation module
+
+  vTaskDelay(pdMS_TO_TICKS(50));
+
+  while (!(HIB_CTL_R & 0x80000000));
+  if (!(HIB_CTL_R & 0x01))
   {
-    case 0:
-      set_state( 1 );
-      wait( 100 );
-      break;
-    case 1:
-      sec++;
-      if( sec >= 60 )
-      {
-        min++;
-        if( min >= 60 )
-        {
-       	  hour++;
-          if( hour >= 24 )
-            hour = 0;
-          min = 0;
-        }
-        sec = 0;
-      }
-      wait( 200 );
-      signal( SEM_RTC_UPDATED );
-      break;
+      HIB_CTL_R |= 0x00000040; // Tiva 32.768 kHz crystal
+  }
+
+  vTaskDelay(pdMS_TO_TICKS(100));
+
+  while (!(HIB_CTL_R & 0x80000000));
+  HIB_CTL_R |= 0x00000001;
+
+  while (!(HIB_CTL_R & 0x80000000));
+  HIB_LOAD_R = 0;
+
+  while(1)
+  {
+    // Tiva RTC
+    INT32U time = HIB_RTCC_R % 86400; // Wrap at 24 hours
+
+    hour = time / 3600;
+    min = (time % 3600) / 60;
+    sec = time % 60;
+
+    // Updates every second
+    vTaskDelay( pdMS_TO_TICKS(1000) );
   }
 }
-
-void display_rtc_task(INT8U my_id, INT8U my_state, INT8U event, INT8U data)
-{
-  if( sec & 0x01 )
-    gfprintf( COM2, "%c%c%02d %02d %02d", 0x1B, 0x84, hour, min, sec );
-  else
-    gfprintf( COM2, "%c%c%02d:%02d:%02d", 0x1B, 0x84, hour, min, sec );
-  wait_sem( SEM_RTC_UPDATED, WAIT_FOREVER );
-}
-
-
 
 /****************************** End Of Module *******************************/
 

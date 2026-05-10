@@ -1,5 +1,6 @@
 /***************************** Include files *******************************/
 #include <stdint.h>
+#include <stdio.h>
 #include <time.h>
 #include "tm4c123gh6pm.h"
 #include "emp_type.h"
@@ -7,9 +8,10 @@
 #include "tmodel.h"
 #include "queue.h"
 #include "lcd.h"
+#include "rtc.h"
+#include "string.h"
 /*****************************    Defines    *******************************/
 
-static char log_buf[128];
 extern QueueHandle_t xUARTQueue;
 extern QueueHandle_t xLCDQueue;
 
@@ -149,10 +151,33 @@ void uart0_init( INT32U baud_rate, INT8U databits, INT8U stopbits, INT8U parity 
   UART0_CTL_R |= (UART_CTL_UARTEN | UART_CTL_TXE | UART_CTL_RXE); // Enable UART TX and RX
 }
 
+static void build_timestamp(char *timestamp, char *msg)
+{
+    static char hour_str[3], min_str[3], sec_str[3];
+
+    hour_str[0] = '0' + get_hour() / 10;  hour_str[1] = '0' + get_hour() % 10;  hour_str[2] = '\0';
+    min_str[0]  = '0' + get_min()  / 10;  min_str[1]  = '0' + get_min()  % 10;  min_str[2]  = '\0';
+    sec_str[0]  = '0' + get_sec()  / 10;  sec_str[1]  = '0' + get_sec()  % 10;  sec_str[2]  = '\0';
+
+    strcpy(timestamp, "[");
+    strcat(timestamp, hour_str);
+    strcat(timestamp, ":");
+    strcat(timestamp, min_str);
+    strcat(timestamp, ":");
+    strcat(timestamp, sec_str);
+    strcat(timestamp, "] ");
+    strcat(timestamp, msg);
+}
+
 void uart_log_task(void *pvParameters)
 {
   INT8U coffee_type;
   INT8U *pStr;
+  INT8U *discard;
+  char *p;
+
+  // Timestamped log message
+  static char timestamp[96];
 
   while (1)
   {
@@ -166,19 +191,34 @@ void uart_log_task(void *pvParameters)
           case 1: msg = "Product: Latte | Price: 27 DKK | Amount: 1\r\n";    break;
           case 2: msg = "Product: Filter Coffee\r\n";                        break;
       }
-      vTaskDelay(pdMS_TO_TICKS(2000));
+
+      // Send log message to LCD
       pStr = (INT8U *)"Logging... ";
       xQueueSend(xLCDQueue, (void *) &pStr, portMAX_DELAY);
-      while (*msg != '\0')
+      // Make sure logging is readable in LCD
+      vTaskDelay(pdMS_TO_TICKS(2000));
+
+      while (xQueueReceive(xLCDQueue, &discard, 0) == pdTRUE);
+      vTaskDelay(pdMS_TO_TICKS(2000));
+
+      // Get current time from RTC
+      build_timestamp(timestamp, msg);
+
+      // Send log message to UART
+      p = timestamp;
+      while (*p != '\0')
       {
         while (!uart0_tx_rdy())
         {
           vTaskDelay(pdMS_TO_TICKS(1));
         }
-        uart0_putc((INT8U)*msg++);
+        uart0_putc((INT8U)*p++);
       }
+
+      // Write completed log message to LCD
       pStr = (INT8U *)"Logging complete ";
       xQueueSend(xLCDQueue, (void *) &pStr, portMAX_DELAY);
+      vTaskDelay(pdMS_TO_TICKS(2000));
     }
   }
 }
