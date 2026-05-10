@@ -21,10 +21,8 @@
   #define _KEY_H
 
 BOOLEAN get_keyboard( INT8U* );
-<<<<<<< HEAD
 void key_task(void *pvParameters );
 
-=======
 
 void key_task(void *pvParameters);
 /*****************************************************************************
@@ -32,7 +30,5 @@ void key_task(void *pvParameters);
 *   Output   : -
 *   Function : FreeRTOS keypad scanning task
 ******************************************************************************/
->>>>>>> 3fe2449 (jfewj)
-
 
 #endif

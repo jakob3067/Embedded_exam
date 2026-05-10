@@ -119,12 +119,9 @@ void key_init(void)
 
 void key_task(void *pvParameters)
 {
-<<<<<<< HEAD
-=======
   INT8U column;
   INT8U debounce_count;
   
->>>>>>> 3fe2449 (jfewj)
   (void)pvParameters;
   INT8U key_val = 0;
   INT8U col;
