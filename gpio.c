@@ -62,9 +62,10 @@ void init_gpio(void)
   GPIO_PORTD_DEN_R = 0x4C;
   GPIO_PORTF_DEN_R = 0x1F;
 
-  GPIO_PORTE_DIR_R = ~0x0F;
-  GPIO_PORTE_DEN_R = 0x0F;
-  GPIO_PORTE_PUR_R = 0x0F;
+  // Configure Port E for keypad (rows - inputs)
+  GPIO_PORTE_DIR_R &= ~0x0F;  /* PE0-PE3 as inputs */
+  GPIO_PORTE_DEN_R |= 0x0F;   /* Digital enable */
+  GPIO_PORTE_PDR_R |= 0x0F;   /* Pull-down resistors for keypad rows */
 
   // Enable internal pull-up (PF0 and PF4).
   GPIO_PORTF_PUR_R = 0x11;
