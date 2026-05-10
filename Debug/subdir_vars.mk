@@ -24,6 +24,7 @@ C_SRCS += \
 ../list.c \
 ../main.c \
 ../menu.c \
+../payment.c \
 ../port.c \
 ../queue.c \
 ../rtc.c \
@@ -49,6 +50,7 @@ C_DEPS += \
 ./list.d \
 ./main.d \
 ./menu.d \
+./payment.d \
 ./port.d \
 ./queue.d \
 ./rtc.d \
@@ -74,6 +76,7 @@ OBJS += \
 ./list.obj \
 ./main.obj \
 ./menu.obj \
+./payment.obj \
 ./port.obj \
 ./portasm.obj \
 ./queue.obj \
@@ -103,6 +106,7 @@ OBJS__QUOTED += \
 "list.obj" \
 "main.obj" \
 "menu.obj" \
+"payment.obj" \
 "port.obj" \
 "portasm.obj" \
 "queue.obj" \
@@ -129,6 +133,7 @@ C_DEPS__QUOTED += \
 "list.d" \
 "main.d" \
 "menu.d" \
+"payment.d" \
 "port.d" \
 "queue.d" \
 "rtc.d" \
@@ -157,6 +162,7 @@ C_SRCS__QUOTED += \
 "../list.c" \
 "../main.c" \
 "../menu.c" \
+"../payment.c" \
 "../port.c" \
 "../queue.c" \
 "../rtc.c" \
