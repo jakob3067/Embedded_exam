@@ -36,12 +36,14 @@ QueueHandle_t xUIQueue;
 QueueHandle_t xUARTQueue;
 QueueHandle_t xEncoderQueue;
 //QueueHandle_t xMenuQueue;
+QueueHandle_t xKeyQueue;
 
 static void setupHardware(void){
   // Warning: If you do not initialize the hardware clock, the timings will be inaccurate
   init_systick();
   status_led_init();
   init_gpio();
+  key_init();
   uart0_init(115200, 8, 1, 'n');
 }
 
@@ -56,12 +58,14 @@ int main(void)
     xUIQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U));
     xEncoderQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U));
     //xMenuQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U));
+    xKeyQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U));
 
-    xTaskCreate( lcd_task, "lcd", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
-    xTaskCreate( button_task, "button", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
-    xTaskCreate( brew_task, "brew", USERTASK_STACK_SIZE, (void*)g, MED_PRIO, NULL);
+    //xTaskCreate( lcd_task, "lcd", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
+    xTaskCreate( key_task, "key", USERTASK_STACK_SIZE, NULL, HIGH_PRIO, NULL);
+    //xTaskCreate( button_task, "button", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
+    //xTaskCreate( brew_task, "brew", USERTASK_STACK_SIZE, (void*)g, MED_PRIO, NULL);
     xTaskCreate( uart_log_task, "log", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
-    xTaskCreate( ui_task, "ui", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
+    xTaskCreate( ui_task, "ui", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
     xTaskCreate( rtc_task, "rtc", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
     xTaskCreate( encoder_task, "encoder", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
     //xTaskCreate( menu_task, "menu", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
@@ -69,7 +73,6 @@ int main(void)
     vTaskStartScheduler();
 
 	while(1){
-	    // Write to the LCD
-
+	    // Cant touch this
 	}
 }

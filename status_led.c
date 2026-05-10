@@ -32,6 +32,7 @@
 
 /*****************************    Defines    *******************************/
 #define PF0		0		// Bit 0
+extern QueueHandle_t xKeyQueue;
 
 /*****************************   Constants   *******************************/
 
@@ -60,13 +61,20 @@ void status_led_init(void)
 
 void status_led_task(void *pvParameters)
 {
+    INT8U key_val;
 	
 	while(1)
 	{
-		// Toggle status led on PORTD
-	    GPIO_PORTD_DATA_R ^= 0x40;
-		vTaskDelay(pdMS_TO_TICKS(500)); // wait 500 ms.
+		// Toggle status led
+	    if (xQueueReceive(xKeyQueue, &key_val, 0) == pdTRUE)
+	    {
+	        GPIO_PORTD_DATA_R ^= 0x40;
+	        vTaskDelay(pdMS_TO_TICKS(1000)); // wait 1000 ms.
+	        GPIO_PORTD_DATA_R ^= 0x40;
+	        vTaskDelay(pdMS_TO_TICKS(1000)); // wait 1000 ms.
 
+	    }
+	    vTaskDelay(pdMS_TO_TICKS(20));
 	}
 }
 
@@ -75,7 +83,6 @@ void status_led_task(void *pvParameters)
 void status_led_task_2(void *pvParameters)
 {
 
-    status_led_init();
 
     while(1)
     {

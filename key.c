@@ -1,178 +1,147 @@
-/**********************************************
+/*****************************************************************************
 * University of Southern Denmark
-* Embedded Programing (EMP)
+* Embedded Programming (EMP)
 *
-* MODULENAME: key.c
-* PROJECT: Assignment 7
-* DESCRIPTION: See module specification file (.h-file)
-* Change log:
-***********************************************
-* Date of Change
+* MODULENAME.: key.c
+*
+* PROJECT....: EMP
+*
+* DESCRIPTION: See module specification file (.h-file).
+*
+* Change Log:
+*****************************************************************************
+* Date    Id    Change
 * YYMMDD
-* ----------------
-* 260410 NK Module created.
+* --------------------
+* 150321  MoH   Module created.
 *
-***********************************************/
-/***************** Header *********************/
-/***************** Include files **************/
-#include "key.h"
-#include "FreeRTOS.h"
-#include "emp_type.h"
-#include "queue.h"
-#include "task.h"
-#include "tm4c123gh6pm.h"
+*****************************************************************************/
+
+/***************************** Include files *******************************/
 #include <stdint.h>
-/***************** Defines ********************/
-/***** Pin mapping *****
- * Columns (drive, output): PA2, PA3, PA4
- * Rows    (read,  input):  PE0, PE1, PE2, PE3
- ***********************/
-#define COL_MASK 0x1C /* PA2|PA3|PA4 */
-#define ROW_MASK 0x0F /* PE0..PE3    */
-/***************** Constants ******************/
-static QueueHandle_t key_queue;
-static const char keymap[3][4] = {
-    {'*', '7', '4', '1'}, {'0', '8', '5', '2'}, {'#', '9', '6', '3'}};
-static INT8U row_index(INT8U y) {
-  switch (y) {
-  case 0x01:
+#include <stdbool.h>
+#include "tm4c123gh6pm.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "emp_type.h"
+#include "key.h"
+#include "uart.h"
+
+extern QueueHandle_t xKeyQueue;
+
+static INT8U row(INT8U y)
+{
+    switch(y)
+    {
+        case 0x08: return 1;  // PE3 = Y1 = row 1 (1,2,3)
+        case 0x04: return 2;  // PE2 = Y2 = row 2 (4,5,6)
+        case 0x02: return 3;  // PE1 = Y3 = row 3 (7,8,9)
+        case 0x01: return 4;  // PE0 = Y4 = row 4 (*,0,#)
+    }
+    return 0;
+}
+
+static INT8U key_catch(INT8U x, INT8U y)
+{
+    const INT8U matrix[4][3] = {{'1','2','3'},
+                                 {'4','5','6'},
+                                 {'7','8','9'},
+                                 {'*','0','#'}};
+    if (x < 1 || x > 3 || y < 1 || y > 4) return 0;
+    return matrix[y-1][x-1];
+}
+
+void drive_column(INT8U col)
+{
+    GPIO_PORTA_DATA_R &= ~0x1C;  // all columns LOW first
+    switch(col)
+    {
+        case 1: GPIO_PORTA_DATA_R |= 0x10; break;  // PA4
+        case 2: GPIO_PORTA_DATA_R |= 0x08; break;  // PA3
+        case 3: GPIO_PORTA_DATA_R |= 0x04; break;  // PA2
+    }
+}
+
+BOOLEAN check_column(INT8U x, INT8U *pressed_key)
+{
+    volatile int i;
+    INT8U y, r;
+
+    drive_column(x);
+
+    for(i = 0; i < 1000; i++);  // settle time
+
+    // Pull-downs: unpressed = LOW, pressed = HIGH, no inversion needed
+    y = GPIO_PORTE_DATA_R & 0x0F;
+
+    // All columns low after reading
+    GPIO_PORTA_DATA_R &= ~0x1C;
+
+    if(y == 0)                      { *pressed_key = 0; return 0; }
+    if((y & (y - 1)) != 0)         { *pressed_key = 0; return 0; }  // multi-press
+
+    r = row(y);
+    if(r == 0)                      { *pressed_key = 0; return 0; }
+
+    *pressed_key = key_catch(x, r);
     return 1;
-  case 0x02:
-    return 2;
-  case 0x04:
-    return 3;
-  case 0x08:
-    return 4;
-  }
-  return 0;
-}
-/***************** Variables ******************/
-/***************** Functions ******************/
-void key_init(void)
-/**********************************************
-* Input:
-* Output:
-* Function: Init gpio pins for keypad.
-***********************************************/
-{
-  /* Enable PORTA and PORTE clocks */
-  SYSCTL_RCGCGPIO_R |= (1 << 0) | (1 << 4);
-  while ((SYSCTL_PRGPIO_R & ((1 << 0) | (1 << 4))) == 0) {
-  }
-
-  /* PA2..PA4 outputs (columns) */
-  GPIO_PORTA_DIR_R |= COL_MASK;
-  GPIO_PORTA_DEN_R |= COL_MASK;
-  GPIO_PORTA_DATA_R &= ~COL_MASK;
-
-  /* PE0..PE3 inputs (rows), pull-down */
-  GPIO_PORTE_DIR_R &= ~ROW_MASK;
-  GPIO_PORTE_DEN_R |= ROW_MASK;
-  GPIO_PORTE_PDR_R |= ROW_MASK;
-
-  key_queue = xQueueCreate(10, sizeof(INT8U));
-}
-
-INT8U key_get(void)
-/**********************************************
-* Input:
-* Output: Char from key queue.
-* Function: Get char from key queue.
-***********************************************/
-{
-  INT8U ch;
-  xQueueReceive(key_queue, &ch, portMAX_DELAY);
-  return ch;
 }
 
 BOOLEAN get_keyboard(INT8U *pch)
-/**********************************************
-* Input: Pointer to char.
-* Output: TRUE/FALSE (1/0).
-* Function: Get char from key queue for file system.
-***********************************************/
 {
-  if (xQueueReceive(key_queue, pch, 0) == pdTRUE)
-  {
-    return 1;
-  }
-  return 0;
+    if(xKeyQueue == NULL) return 0;
+    return (xQueueReceive(xKeyQueue, pch, pdMS_TO_TICKS(20)) == pdTRUE);
 }
 
-static INT8U scan_column(INT8U col_bit, INT8U col_index)
-/**********************************************
-* Input: column bit, column index
-* Output: Ture/false.
-* Function: Scan column for keypress.
-***********************************************/
+void key_init(void)
 {
-  INT8U y;
+    SYSCTL_RCGCGPIO_R |= (1 << 0) | (1 << 4);
+    while((SYSCTL_PRGPIO_R & ((1 << 0) | (1 << 4))) == 0);
 
-  GPIO_PORTA_DATA_R &= ~COL_MASK;
-  GPIO_PORTA_DATA_R |= col_bit;
+    // PA2, PA3, PA4 = outputs (columns)
+    GPIO_PORTA_DIR_R |= 0x1C;
+    GPIO_PORTA_DEN_R |= 0x1C;
+    GPIO_PORTA_DATA_R &= ~0x1C;  // start all columns low
 
-  /* tiny settle */
-  {
-    volatile int d;
-    for (d = 0; d < 50; d++) {
+    // PE0, PE1, PE2, PE3 = inputs (rows) with pull-downs
+    GPIO_PORTE_DIR_R &= ~0x0F;
+    GPIO_PORTE_DEN_R |= 0x0F;
+    GPIO_PORTE_PDR_R |= 0x0F;   // pull-DOWN to match schematic
+}
+
+void key_task(void *pvParameters)
+{
+    (void)pvParameters;
+    INT8U key_val;
+    INT8U col;
+    INT8U last_key = 0;
+
+    while(1)
+    {
+        key_val = 0;
+
+        for(col = 1; col <= 3; col++)
+        {
+            if(check_column(col, &key_val))
+                break;
+        }
+
+        if(key_val != 0 && key_val != last_key)
+        {
+            uart0_putc('[');
+            uart0_putc(key_val);
+            uart0_putc(']');
+            uart0_putc('\r');
+            uart0_putc('\n');
+
+            xQueueSend(xKeyQueue, &key_val, 0);
+            last_key = key_val;
+        }
+
+        if(key_val == 0)
+            last_key = 0;
+
+        vTaskDelay(pdMS_TO_TICKS(50));
     }
-  }
-
-  y = GPIO_PORTE_DATA_R & ROW_MASK;
-  if (y) {
-    INT8U r = row_index(y);
-    if (r) {
-      INT8U ch = keymap[col_index - 1][r - 1];
-      xQueueSend(key_queue, &ch, 0);
-      return 1;
-    }
-  }
-  return 0;
 }
-
-QueueHandle_t key_queue_handle(void) {
-  return key_queue;
-}
-
-static void vKeyTask(void *pvParameters)
-/**********************************************
-* Input:
-* Output:
-* Function: Keypad task for FreeRTOS.
-***********************************************/
-{
-  TickType_t last = xTaskGetTickCount();
-  INT8U pressed;
-
-  for (;;) {
-    pressed = 0;
-    if (scan_column(0x10, 1))
-      pressed = 1; /* PA4 = col 1 */
-    else if (scan_column(0x08, 2))
-      pressed = 1; /* PA3 = col 2 */
-    else if (scan_column(0x04, 3))
-      pressed = 1; /* PA2 = col 3 */
-
-    if (pressed) {
-      /* wait for release: drive all cols high, watch rows */
-      GPIO_PORTA_DATA_R |= COL_MASK;
-      while (GPIO_PORTE_DATA_R & ROW_MASK) {
-        vTaskDelay(pdMS_TO_TICKS(20));
-      }
-      GPIO_PORTA_DATA_R &= ~COL_MASK;
-    }
-
-    vTaskDelayUntil(&last, pdMS_TO_TICKS(20));
-  }
-}
-
-void key_create_task(INT8U priority)
-/**********************************************
-* Input: Task priority
-* Output:
-* Function: Create keypad task for FreeRTOS
-***********************************************/
-{
-  xTaskCreate(vKeyTask, "key", 128, NULL, priority, NULL);
-}
-/***************** Enf of module **************/

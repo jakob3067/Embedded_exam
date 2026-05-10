@@ -46,7 +46,7 @@ INT16S   dummy2;
 /*****************************   Functions   *******************************/
 INT8U button_pushed()
 {
-  return( !(GPIO_PORTF_DATA_R & 0x01) );
+  return( !(GPIO_PORTF_DATA_R & 0x10) );
 }
 
 void button_task(void *pvParameters)
