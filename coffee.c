@@ -17,7 +17,7 @@
 //#include "glob_def.h"
 //#include "binary.h"
 #include "status_led.h"
-#include "coffee.h"
+//#include "coffee.h"
 #include "button.h"
 #include "uart.h"
 
@@ -29,7 +29,7 @@
 extern QueueHandle_t xLCDQueue;
 extern QueueHandle_t xButtonQueue;
 extern QueueHandle_t xUARTQueue;
-extern QueueHandle_t xMenuQueue;
+//extern QueueHandle_t xMenuQueue;
 
 /*****************************   Constants   *******************************/
 
@@ -182,8 +182,8 @@ void brew_task(void *pvParameters)
     vTaskDelay(pdMS_TO_TICKS(100));
 
     volatile int coffee;
-    coffee = xQueueReceive(xMenuQueue, &coffee, portMAX_DELAY);
-    brew(coffee);
+    //coffee = xQueueReceive(xMenuQueue, &coffee, portMAX_DELAY);
+    brew((int)pvParameters);
 
     vTaskDelete(NULL);
 }
