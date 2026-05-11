@@ -44,7 +44,7 @@ static void setupHardware(void){
 
 int main(void)
 {
-    int g = 2; // 0 for espresso, 1 for latte, 2 for filter coffee
+    int g = 0; // 0 for espresso, 1 for latte, 2 for filter coffee
 
     setupHardware();
     xLCDQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U *));
@@ -52,13 +52,14 @@ int main(void)
     xUARTQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U));
     xKeyQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U));
 
-    //xTaskCreate( lcd_task, "lcd", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
+    xTaskCreate( lcd_task, "lcd", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
     xTaskCreate( key_task, "key", USERTASK_STACK_SIZE, NULL, HIGH_PRIO, NULL);
-    //xTaskCreate( button_task, "button", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
-    //xTaskCreate( brew_task, "brew", USERTASK_STACK_SIZE, (void*)g, LOW_PRIO, NULL);
+    xTaskCreate( button_task, "button", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
+    xTaskCreate( brew_task, "brew", USERTASK_STACK_SIZE, (void*)g, LOW_PRIO, NULL);
     xTaskCreate( uart_log_task, "log", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
     xTaskCreate( ui_task, "ui", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
-
+    //xTaskCreate(payment_option, "pay", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
+    //payment_option();
     vTaskStartScheduler();
 
 	while(1){
