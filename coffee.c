@@ -31,7 +31,7 @@ extern QueueHandle_t xButtonQueue;
 extern QueueHandle_t xUARTQueue;
 extern QueueHandle_t xEncoderQueue;
 extern QueueHandle_t xKeyQueue;
-//extern QueueHandle_t xMenuQueue;
+extern QueueHandle_t xMenuQueue;
 
 /*****************************   Constants   *******************************/
 int card_len;
@@ -39,6 +39,8 @@ int pin_len;
 /*****************************   Variables   *******************************/
 INT8U card_details[16];
 INT8U card_pin[4];
+
+extern is_brewing;
 /*****************************   Functions   *******************************/
 
 void brew(int coffee)
