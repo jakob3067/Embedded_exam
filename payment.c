@@ -61,6 +61,11 @@ void payment_task(void *pvParameters)
                         pStr = (INT8U *)"Insert money";
                         xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
 
+                        vTaskDelay(pdMS_TO_TICKS(2000));
+
+                        pStr = (INT8U *)" '*' When done";
+                        xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+
                         while(1)
                         {
                             if(xQueueReceive(xEncoderQueue, &coin, 0) == pdTRUE)
@@ -73,6 +78,9 @@ void payment_task(void *pvParameters)
                                     vTaskDelay(pdMS_TO_TICKS(1000));
                                     pStr = (INT8U *)"5 received";
                                     xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+                                    vTaskDelay(pdMS_TO_TICKS(1000));
+                                    pStr = (INT8U *)" '*' When done";
+                                    xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
                                 }
                                 else if(coin == 20)
                                 {
@@ -80,6 +88,9 @@ void payment_task(void *pvParameters)
                                     xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
                                     vTaskDelay(pdMS_TO_TICKS(1000));
                                     pStr = (INT8U *)"20 received";
+                                    xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+                                    vTaskDelay(pdMS_TO_TICKS(1000));
+                                    pStr = (INT8U *)" '*' When done";
                                     xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
                                 }
                             }
@@ -102,6 +113,7 @@ void payment_task(void *pvParameters)
                                         change = cash - target_price;
                                         pStr = (INT8U *)"Returning change";
                                         xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+                                        vTaskDelay(pdMS_TO_TICKS(1000));
                                         for(i = 0; i < change; i++)
                                         {
                                             // Blink green LED for each 1kr in change

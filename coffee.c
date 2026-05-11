@@ -90,6 +90,7 @@ void brew(int coffee)
     INT8U *pStr;
     INT8U btn_event;
 
+    GPIO_PORTF_DATA_R &= ~0x08;
     if (coffee == 0)
     {
         // Espresso
@@ -119,8 +120,24 @@ void brew(int coffee)
                 // Duration
                 vTaskDelay(pdMS_TO_TICKS(14000));
                 GPIO_PORTF_DATA_R |= 0x02; /* Red off */
-                pStr = (INT8U *)"Coffee done!";
-                xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+
+                while(1)
+                {
+                    if(!(GPIO_PORTF_DATA_R & 0x10))
+                    {
+                        pStr = (INT8U *)"Coffee done!";
+                        xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+                        vTaskDelay(pdMS_TO_TICKS(2000));
+                        break;
+                    }
+                    else
+                    {
+                        pStr = (INT8U *)"Place cup";
+                        xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+                    }
+                    vTaskDelay(pdMS_TO_TICKS(1000));
+
+                }
 
                 // Send coffee type to UART
                 xQueueSend(xUARTQueue, &coffee_type, portMAX_DELAY);
@@ -176,8 +193,23 @@ void brew(int coffee)
                 // Duration
                 vTaskDelay(pdMS_TO_TICKS(6200));
                 GPIO_PORTF_DATA_R |= 0x08; /* Green off */
-                pStr = (INT8U *)"Coffee done!";
-                xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+
+                while(1)
+                {
+                    if(!(GPIO_PORTF_DATA_R & 0x10))
+                    {
+                        pStr = (INT8U *)"Coffee done!";
+                        xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+                        vTaskDelay(pdMS_TO_TICKS(2000));
+                        break;
+                    }
+                    else
+                    {
+                        pStr = (INT8U *)"Place cup";
+                        xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+                    }
+                    vTaskDelay(pdMS_TO_TICKS(1000));
+                }
 
                 // Send coffee type to UART
                 xQueueSend(xUARTQueue, &coffee_type, portMAX_DELAY);
@@ -228,10 +260,23 @@ void brew(int coffee)
                         {
                             // Stop brewing
                             GPIO_PORTF_DATA_R &= ~0xFD; // Red off
-                            pStr = (INT8U *)"Coffee done!";
-                            xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
-                            // Give time to read LCD
-                            vTaskDelay(pdMS_TO_TICKS(2000));
+
+                            while(1)
+                            {
+                                if(!(GPIO_PORTF_DATA_R & 0x10))
+                                {
+                                    pStr = (INT8U *)"Coffee done!";
+                                    xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+                                    vTaskDelay(pdMS_TO_TICKS(2000));
+                                    break;
+                                }
+                                else
+                                {
+                                    pStr = (INT8U *)"Place cup";
+                                    xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+                                }
+                                vTaskDelay(pdMS_TO_TICKS(1000));
+                            }
 
                             // Send coffee type to UART
                             xQueueSend(xUARTQueue, &coffee_type, portMAX_DELAY);
