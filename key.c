@@ -79,7 +79,6 @@ BOOLEAN check_column(INT8U x, INT8U *pressed_key)
     GPIO_PORTA_DATA_R &= ~0x1C;
 
     if(y == 0)                      { *pressed_key = 0; return 0; }
-    if((y & (y - 1)) != 0)         { *pressed_key = 0; return 0; }  // multi-press
 
     r = row(y);
     if(r == 0)                      { *pressed_key = 0; return 0; }

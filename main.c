@@ -67,10 +67,8 @@ int main(void)
     xTaskCreate( brew_task, "brew", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
     xTaskCreate( uart_log_task, "log", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
     xTaskCreate( ui_task, "ui", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
-    xTaskCreate( rtc_task, "rtc", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
-    xTaskCreate( encoder_task, "encoder", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
-    xTaskCreate( menu_task, "menu", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
-
+    xTaskCreate(payment_option, "pay", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
+    //payment_option();
     vTaskStartScheduler();
 
 	while(1){
