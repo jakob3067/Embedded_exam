@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdio.h>
 #include "tm4c123gh6pm.h"
 #include "emp_type.h"
 #include "systick_frt.h"
@@ -11,12 +12,14 @@
 #include "button.h"
 #include "uart.h"
 #include "ui.h"
+#include "rtc.h"
+#include "encoder.h"
+//#include "menu.h"
+#include "coffee.h"
 
 #include "queue.h"
 #include "gpio.h"
 
-#include "menu.h"
-#include "coffee.h"
 
 
 #define USERTASK_STACK_SIZE configMINIMAL_STACK_SIZE
@@ -31,6 +34,8 @@ QueueHandle_t xLCDQueue;
 QueueHandle_t xButtonQueue;
 QueueHandle_t xUIQueue;
 QueueHandle_t xUARTQueue;
+QueueHandle_t xEncoderQueue;
+//QueueHandle_t xMenuQueue;
 QueueHandle_t xKeyQueue;
 
 static void setupHardware(void){
@@ -50,6 +55,9 @@ int main(void)
     xLCDQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U *));
     xButtonQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U *));
     xUARTQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U));
+    xUIQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U));
+    xEncoderQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U));
+    //xMenuQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U));
     xKeyQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U));
 
     xTaskCreate( lcd_task, "lcd", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);

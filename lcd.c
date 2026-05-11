@@ -116,13 +116,20 @@ void wr_ctrl_LCD_high( INT8U Ch )
 void out_LCD_low( INT8U Ch )
 {
   INT8U temp;
+  volatile int i;
 	  
   temp = GPIO_PORTC_DATA_R & 0x0F;
   GPIO_PORTC_DATA_R  = temp | ((Ch & 0x0F) << 4);
   //GPIO_PORTD_DATA_R &= 0x7F;        // Select write
   GPIO_PORTD_DATA_R |= 0x04;        // Select data mode
+  for( i=0; i<1000; i )
+        i++;
   GPIO_PORTD_DATA_R |= 0x08;		// Set E High
+  for( i=0; i<1000; i )
+        i++;
   GPIO_PORTD_DATA_R &= 0xF7;		// Set E Low
+  for( i=0; i<1000; i )
+        i++;
 }
 
 void out_LCD_high( INT8U Ch )
@@ -188,17 +195,17 @@ void lcd_task(void *pvParameters)
 {
   INT8U init_idx = 0;
   INT8U *pStr = (INT8U *)pvParameters;
+  (void) *pvParameters;
+  char msg[] = "LCD Ready";
 
   /* Perform LCD init sequence using vTaskDelay (scheduler must be running) */
   for (init_idx = 0; LCD_init_sequense[init_idx] != 0xFF; init_idx++)
   {
     wr_ctrl_LCD(LCD_init_sequense[init_idx]);
     vTaskDelay(pdMS_TO_TICKS(5));
+    vTaskDelay(pdMS_TO_TICKS(5));
   }
-
   vTaskDelay(pdMS_TO_TICKS(5));
-
-
 
   /* Keep task alive */
   while (1)

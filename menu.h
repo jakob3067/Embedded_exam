@@ -10,6 +10,4 @@
 
 void menu_task(void *pvParameters);
 
-
-
 #endif /* MENU_H_ */

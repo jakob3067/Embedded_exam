@@ -20,7 +20,7 @@
 #include "coffee.h"
 #include "button.h"
 #include "uart.h"
-
+#include "encoder.h"
 
 /*****************************    Defines    *******************************/
 #define PF0     0       // Bit 0
@@ -29,7 +29,8 @@
 extern QueueHandle_t xLCDQueue;
 extern QueueHandle_t xButtonQueue;
 extern QueueHandle_t xUARTQueue;
-extern QueueHandle_t xKeyQueue;
+extern QueueHandle_t xEncoderQueue;
+//extern QueueHandle_t xMenuQueue;
 
 /*****************************   Constants   *******************************/
 int card_len;
@@ -43,9 +44,11 @@ void brew(int coffee)
 {
     INT8U *pStr;
     INT8U btn_event;
+    INT8U *total;
+    INT16U cash;
+    INT8U cash_buffer[20];
 
 
-    payment_option();
 
     if (coffee == 0)
     {
@@ -121,8 +124,41 @@ void brew(int coffee)
         // Filter Coffee
         INT8U coffee_type = coffee;
         // Write to LCD
-        pStr = (INT8U *)"Press button";
+        pStr = (INT8U *)"Insert money";
         xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+
+        while(1)
+        {
+            if(xQueueReceive(xEncoderQueue, &total, portMAX_DELAY) == pdTRUE)
+            {
+
+                if(total == 5)
+                {
+                    pStr = (INT8U *)"MONEY!";
+                    xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+                    vTaskDelay(pdMS_TO_TICKS(1000));
+                    pStr = (INT8U *)"5 received";
+                    xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+                }
+                else if(total == 20)
+                {
+                    pStr = (INT8U *)"MONEY!";
+                    xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+                    vTaskDelay(pdMS_TO_TICKS(1000));
+                    pStr = (INT8U *)"20 received";
+                    xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+                }
+//                cash = cash + total;
+//                sprintf((char *)cash_buffer, "Total: %d", cash);
+//                pStr = (INT8U *)cash_buffer;
+//                xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+
+                vTaskDelay(pdMS_TO_TICKS(100));
+            }
+            vTaskDelay(pdMS_TO_TICKS(10));
+        }
+
+
         while(1) // While "money"
         {
             // Check for button press
@@ -149,12 +185,22 @@ void brew(int coffee)
                     GPIO_PORTF_DATA_R &= ~0xFD; // Red off
                     pStr = (INT8U *)"Coffee done!";
                     xQueueSend(xLCDQueue, (void *) &pStr, portMAX_DELAY);
+                    // Give time to read LCD
+                    vTaskDelay(pdMS_TO_TICKS(2000));
 
                     // Send coffee type to UART
                     xQueueSend(xUARTQueue, &coffee_type, portMAX_DELAY);
                     break;
                 }
             }
+        }
+
+        GPIO_PORTF_DATA_R &= 0xFD;
+        vTaskDelay(pdMS_TO_TICKS(10));
+        if( button_pushed( ))
+        {
+            GPIO_PORTF_DATA_R &= 0xF7;
+            vTaskDelay(pdMS_TO_TICKS(1000));
         }
     }
     else
@@ -309,14 +355,18 @@ INT8U validate_pay(INT8U *card_details, INT8U *card_pin)
 
 void brew_task(void *pvParameters)
 {
+    int coffee_type = (int *)pvParameters;
+
     //turns led of when
     GPIO_PORTF_DATA_R |= 0x04;
-    vTaskDelay(pdMS_TO_TICKS(100));
+    vTaskDelay(pdMS_TO_TICKS(10));
     GPIO_PORTF_DATA_R |= 0x02;
-    vTaskDelay(pdMS_TO_TICKS(100));
+    vTaskDelay(pdMS_TO_TICKS(10));
     GPIO_PORTF_DATA_R |= 0x08;
-    vTaskDelay(pdMS_TO_TICKS(100));
+    vTaskDelay(pdMS_TO_TICKS(10));
 
+    volatile int coffee;
+    //coffee = xQueueReceive(xMenuQueue, &coffee, portMAX_DELAY);
     brew((int)pvParameters);
 
     vTaskDelete(NULL);

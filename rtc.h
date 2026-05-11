@@ -5,12 +5,9 @@
 INT8U get_hour();
 INT8U get_min();
 INT8U get_sec();
-void set_hour( INT8U );
-void set_min( INT8U );
-void set_sec( INT8U );
 
-void rtc_task(INT8U, INT8U, INT8U, INT8U );
-void display_rtc_task(INT8U, INT8U, INT8U, INT8U );
-void ajust_rtc_task(INT8U task_no);
+void rtc_task( void *pvParameters );
+void rtc_init();
+void rtc_set_time( INT8U h, INT8U m, INT8U s );
 
 #endif /*RTC_H_*/
