@@ -31,6 +31,7 @@ extern QueueHandle_t xButtonQueue;
 extern QueueHandle_t xUARTQueue;
 extern QueueHandle_t xEncoderQueue;
 extern QueueHandle_t xMenuQueue;
+extern QueueHandle_t xKeyQueue;
 
 extern INT8U is_brewing;
 
@@ -218,7 +219,6 @@ void brew(int coffee)
     }
 }
 
-
 void payment_option(void)
 {
     INT8U *pStr;
@@ -253,7 +253,9 @@ void payment_option(void)
             }
         }
     }
-        while{
+
+    while(1)
+    {
         // --- Card number entry (16 digits) ---
         pStr = (INT8U *)"Enter card nr:";
         xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
@@ -270,6 +272,7 @@ void payment_option(void)
                     i--;  // retry this index
                     continue;
                 }
+
                 card_details[i] = digit;
 
                 // Show '*' for each entered digit
@@ -331,7 +334,7 @@ void payment_option(void)
     // Always accepts for now - replace with real validation later
     vTaskDelay(pdMS_TO_TICKS(3000));
 }
-}
+
 
 
 INT8U validate_pay(INT8U *card_details, INT8U *card_pin)
