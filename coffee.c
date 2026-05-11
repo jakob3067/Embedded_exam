@@ -30,7 +30,9 @@ extern QueueHandle_t xLCDQueue;
 extern QueueHandle_t xButtonQueue;
 extern QueueHandle_t xUARTQueue;
 extern QueueHandle_t xEncoderQueue;
-//extern QueueHandle_t xMenuQueue;
+extern QueueHandle_t xMenuQueue;
+
+extern INT8U is_brewing;
 
 /*****************************   Constants   *******************************/
 
@@ -42,7 +44,7 @@ void brew(int coffee)
 {
     INT8U *pStr;
     INT8U btn_event;
-    INT8U *total;
+    INT8U coin;
     INT16U cash;
     INT8U cash_buffer[20];
 
@@ -126,10 +128,10 @@ void brew(int coffee)
 
         while(1)
         {
-            if(xQueueReceive(xEncoderQueue, &total, portMAX_DELAY) == pdTRUE)
+            if(xQueueReceive(xEncoderQueue, &coin, portMAX_DELAY) == pdTRUE)
             {
-
-                if(total == 5)
+                cash = cash + coin;
+                if(coin == 5)
                 {
                     pStr = (INT8U *)"MONEY!";
                     xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
@@ -137,7 +139,7 @@ void brew(int coffee)
                     pStr = (INT8U *)"5 received";
                     xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
                 }
-                else if(total == 20)
+                else if(coin == 20)
                 {
                     pStr = (INT8U *)"MONEY!";
                     xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
@@ -145,12 +147,10 @@ void brew(int coffee)
                     pStr = (INT8U *)"20 received";
                     xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
                 }
-//                cash = cash + total;
 //                sprintf((char *)cash_buffer, "Total: %d", cash);
 //                pStr = (INT8U *)cash_buffer;
 //                xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
-
-                vTaskDelay(pdMS_TO_TICKS(100));
+//                vTaskDelay(pdMS_TO_TICKS(100));
             }
             vTaskDelay(pdMS_TO_TICKS(10));
         }
@@ -187,6 +187,7 @@ void brew(int coffee)
 
                     // Send coffee type to UART
                     xQueueSend(xUARTQueue, &coffee_type, portMAX_DELAY);
+                    is_brewing = 0;
                     break;
                 }
             }
@@ -217,7 +218,7 @@ void brew(int coffee)
 
 void brew_task(void *pvParameters)
 {
-    int coffee_type = (int *)pvParameters;
+    INT8U coffee_type;
 
     //turns led of when
     GPIO_PORTF_DATA_R |= 0x04;
@@ -227,23 +228,16 @@ void brew_task(void *pvParameters)
     GPIO_PORTF_DATA_R |= 0x08;
     vTaskDelay(pdMS_TO_TICKS(10));
 
-    volatile int coffee;
-    //coffee = xQueueReceive(xMenuQueue, &coffee, portMAX_DELAY);
-    brew((int)pvParameters);
-
-    vTaskDelete(NULL);
+    while(1)
+    {
+        if(xQueueReceive(xMenuQueue, &coffee_type, portMAX_DELAY) == pdTRUE)
+        {
+            is_brewing = 1;
+            brew(coffee_type);
+        }
+    }
+    //vTaskDelete(NULL);
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 
