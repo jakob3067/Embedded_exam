@@ -174,7 +174,6 @@ void uart_log_task(void *pvParameters)
 {
   INT8U coffee_type;
   INT8U *pStr;
-  INT8U *discard;
   char *p;
 
   // Timestamped log message
@@ -186,7 +185,7 @@ void uart_log_task(void *pvParameters)
     if (xQueueReceive(xUARTQueue, &coffee_type, portMAX_DELAY) == pdTRUE)
     {
       pStr = (INT8U *)"Test... ";
-      xQueueSend(xLCDQueue, (void *) &pStr, portMAX_DELAY);
+      xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
       // Make sure logging is readable in LCD
       vTaskDelay(pdMS_TO_TICKS(2000));
       char *msg;
@@ -199,7 +198,7 @@ void uart_log_task(void *pvParameters)
 
       // Send log message to LCD
       pStr = (INT8U *)"Logging... ";
-      xQueueSend(xLCDQueue, (void *) &pStr, portMAX_DELAY);
+      xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
       // Make sure logging is readable in LCD
       vTaskDelay(pdMS_TO_TICKS(2000));
 

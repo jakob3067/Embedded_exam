@@ -14,6 +14,7 @@
 #include "button.h"
 #include "uart.h"
 #include "encoder.h"
+#include "payment.h"
 
 extern QueueHandle_t xLCDQueue;
 extern QueueHandle_t xButtonQueue;
@@ -27,17 +28,26 @@ extern QueueHandle_t xPaymentStatusQueue;
 void payment_task(void *pvParameters)
 {
     INT8U *pStr;
-    INT8U price;
+    INT8U coffee_type;
+    INT8U target_price;
     INT8U key_val;
     INT8U btn_event;
     INT8U coin;
     INT8U cash = 0;
     INT8U success = 1;
+    INT8U change = 0;
 
     while(1)
     {
-        if(xQueueReceive(xPaymentQueue, &price, portMAX_DELAY) == pdTRUE)
+        if(xQueueReceive(xPaymentQueue, &coffee_type, portMAX_DELAY) == pdTRUE)
         {
+            cash = 0;
+            success = 0;
+
+            if (coffee_type == 0) target_price = 10;      // Espresso
+            else if (coffee_type == 1) target_price = 15; // Latte
+            else target_price = 5;                        // Filter
+
             pStr = (INT8U *)"1.Cash 2.Card";
             xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
 
@@ -78,21 +88,47 @@ void payment_task(void *pvParameters)
                             {
                                 if (key_val == '*')
                                 {
-                                    pStr = (INT8U *)"Payment Received";
-                                    xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
-                                    vTaskDelay(pdMS_TO_TICKS(2000));
-                                    break;
+                                    if( cash == target_price || coffee_type == 2)
+                                    {
+                                        pStr = (INT8U *)"Payment Received";
+                                        xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+                                        success = 1;
+                                        vTaskDelay(pdMS_TO_TICKS(2000));
+                                        break;
+                                    }
+                                    else if(cash > target_price && coffee_type != 2)
+                                    {
+                                        volatile int i;
+                                        change = cash - target_price;
+                                        pStr = (INT8U *)"Returning change";
+                                        xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+                                        for(i = 0; i < change; i++)
+                                        {
+                                            // Blink green LED for each 1kr in change
+                                            GPIO_PORTF_DATA_R |= 0x08;
+                                            vTaskDelay(pdMS_TO_TICKS(200));
 
-                                }
-                                else
-                                {
-                                    pStr = (INT8U *)"Invalid";
-                                    xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+                                            GPIO_PORTF_DATA_R &= ~0x08;
+                                            vTaskDelay(pdMS_TO_TICKS(200));
+                                        }
+                                        success = 1;
+                                        vTaskDelay(pdMS_TO_TICKS(2000));
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        pStr = (INT8U *)"Insufficient";
+                                        xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
+                                    }
                                 }
                             }
                             vTaskDelay(pdMS_TO_TICKS(10));
                         }
-                        break;
+                        if(success)
+                        {
+                            break;
+                        }
+
                     }
 
                     else if (btn_event == '2')
@@ -107,6 +143,25 @@ void payment_task(void *pvParameters)
             xQueueSend(xPaymentStatusQueue, &success, portMAX_DELAY);
         }
     }
+}
+
+INT8U validate_pay(INT8U *card_details, INT8U *card_pin)
+{
+    int card_sum = 0;
+    int pin_sum = 0;
+    int i;
+
+    for (i = 0; i < 16; i++)
+        card_sum += (card_details[i] - '0');
+
+    for (i = 0; i < 4; i++)
+        pin_sum += (card_pin[i] - '0');
+
+    // Both even or both odd = valid
+    if ((card_sum % 2) == (pin_sum % 2))
+        return 1;
+    else
+        return 0;
 }
 
 void card(void)
@@ -178,6 +233,7 @@ void card(void)
             xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
             vTaskDelay(pdMS_TO_TICKS(3000));
             xQueueSend(xPaymentStatusQueue, &success, portMAX_DELAY);
+            return;
         }
         else
         {
@@ -190,24 +246,5 @@ void card(void)
         // Always accepts for now - replace with real validation later
         vTaskDelay(pdMS_TO_TICKS(3000));
     }
-}
-
-INT8U validate_pay(INT8U *card_details, INT8U *card_pin)
-{
-    int card_sum = 0;
-    int pin_sum = 0;
-    int i;
-
-    for (i = 0; i < 16; i++)
-        card_sum += (card_details[i] - '0');
-
-    for (i = 0; i < 4; i++)
-        pin_sum += (card_pin[i] - '0');
-
-    // Both even or both odd = valid
-    if ((card_sum % 2) == (pin_sum % 2))
-        return 1;
-    else
-        return 0;
 }
 

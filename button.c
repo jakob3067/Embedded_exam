@@ -44,9 +44,14 @@ INT8U    dummy1;
 INT16S   dummy2;
 
 /*****************************   Functions   *******************************/
-INT8U button_pushed()
+INT8U button1_pushed()
 {
   return( !(GPIO_PORTF_DATA_R & 0x10) );
+}
+
+INT8U button2_pushed()
+{
+  return( !(GPIO_PORTF_DATA_R & 0x01) );
 }
 
 void button_task(void *pvParameters)
@@ -59,7 +64,7 @@ void button_task(void *pvParameters)
 		{
 			case BS_IDLE:
 			    vTaskDelay(pdMS_TO_TICKS(10));
-				if( button_pushed())		// if button pushed
+				if( button2_pushed())		// if button pushed
 				{
 					button_state = BS_PUSH;
 				}
@@ -71,7 +76,7 @@ void button_task(void *pvParameters)
 				vTaskDelay(pdMS_TO_TICKS(200)); // debounce delay
 				while( button_state == BS_PUSH)
 				{
-					if( !button_pushed()) 		// if button released
+					if( !button2_pushed()) 		// if button released
 					{
                         button_state = BS_RELEASED;
                         break;
