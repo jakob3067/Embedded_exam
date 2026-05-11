@@ -37,26 +37,30 @@ void encoder_task(void *pvParameters)
             if(b_new == 1)
             {
                 coin = 5;
+                xQueueSend(xEncoderQueue, &coin, 0);
             }
             else
             {
                 coin = 20;
+                xQueueSend(xEncoderQueue, &coin, 0);
             }
-            total = total + coin;
-            xQueueSend(xEncoderQueue, &total, 0);
+//            total = total + coin;
+//            xQueueSend(xEncoderQueue, &total, 0);
         }
         else if(a == 0 && a_new == 1)
         {
             if(b_new == 1)
             {
                 coin = 20;
+                xQueueSend(xEncoderQueue, &coin, 0);
             }
             else
             {
                 coin = 5;
+                xQueueSend(xEncoderQueue, &coin, 0);
             }
-            total = total + coin;
-            xQueueSend(xEncoderQueue, &total, 0);
+//            total = total + coin;
+//            xQueueSend(xEncoderQueue, &total, 0);
         }
         a = a_new;
         b = b_new;

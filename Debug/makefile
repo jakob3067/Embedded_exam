@@ -2,7 +2,9 @@
 # Automatically-generated file. Do not edit!
 ################################################################################
 
-CG_TOOL_ROOT := /home/jakob/ti/ccs1260/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS
+SHELL = cmd.exe
+
+CG_TOOL_ROOT := C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS
 
 GEN_OPTS__FLAG := 
 GEN_CMDS__FLAG := 
@@ -10,6 +12,7 @@ GEN_CMDS__FLAG :=
 ORDERED_OBJS += \
 "./button.obj" \
 "./coffee.obj" \
+"./encoder.obj" \
 "./encoder.obj" \
 "./file.obj" \
 "./gpio.obj" \
@@ -19,6 +22,7 @@ ORDERED_OBJS += \
 "./list.obj" \
 "./main.obj" \
 "./menu.obj" \
+"./payment.obj" \
 "./payment.obj" \
 "./port.obj" \
 "./portasm.obj" \
@@ -38,8 +42,8 @@ $(GEN_CMDS__FLAG) \
 
 -include ../makefile.init
 
-RM := rm -rf
-RMDIR := rm -rf
+RM := DEL /F
+RMDIR := RMDIR /S/Q
 
 # All of the sources participating in the build are defined here
 -include sources.mk
@@ -141,18 +145,18 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXE_OUTPUTS += \
-Embedded_exam.out 
+EmbeddedExam.out 
 
 EXE_OUTPUTS__QUOTED += \
-"Embedded_exam.out" 
+"EmbeddedExam.out" 
 
 
 # All Target
 all: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
-	@$(MAKE) --no-print-directory -Onone "Embedded_exam.out"
+	@$(MAKE) --no-print-directory -Onone "EmbeddedExam.out"
 
 # Tool invocations
-Embedded_exam.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
+EmbeddedExam.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: Arm Linker'
 	"/home/jakob/ti/ccs1260/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"Embedded_exam.map" --heap_size=0 --stack_size=2048 -i"/home/jakob/ti/ccs1260/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/lib" -i"/home/jakob/ti/ccs1260/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="Embedded_exam_linkInfo.xml" --rom_model -o "Embedded_exam.out" $(ORDERED_OBJS)
@@ -162,6 +166,8 @@ Embedded_exam.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)
+	-$(RM) "button.obj" "coffee.obj" "encoder.obj" "file.obj" "gpio.obj" "heap_2.obj" "key.obj" "lcd.obj" "list.obj" "main.obj" "menu.obj" "payment.obj" "port.obj" "portasm.obj" "queue.obj" "rtc.obj" "rtcs.obj" "startup_frt.obj" "status_led.obj" "string.obj" "systick_frt.obj" "tasks.obj" "uart.obj" "ui.obj" 
+	-$(RM) "button.d" "coffee.d" "encoder.d" "file.d" "gpio.d" "heap_2.d" "key.d" "lcd.d" "list.d" "main.d" "menu.d" "payment.d" "port.d" "queue.d" "rtc.d" "rtcs.d" "startup_frt.d" "status_led.d" "string.d" "systick_frt.d" "tasks.d" "uart.d" "ui.d" 
 	-$(RM) "button.obj" "coffee.obj" "encoder.obj" "file.obj" "gpio.obj" "heap_2.obj" "key.obj" "lcd.obj" "list.obj" "main.obj" "menu.obj" "payment.obj" "port.obj" "portasm.obj" "queue.obj" "rtc.obj" "rtcs.obj" "startup_frt.obj" "status_led.obj" "string.obj" "systick_frt.obj" "tasks.obj" "uart.obj" "ui.obj" 
 	-$(RM) "button.d" "coffee.d" "encoder.d" "file.d" "gpio.d" "heap_2.d" "key.d" "lcd.d" "list.d" "main.d" "menu.d" "payment.d" "port.d" "queue.d" "rtc.d" "rtcs.d" "startup_frt.d" "status_led.d" "string.d" "systick_frt.d" "tasks.d" "uart.d" "ui.d" 
 	-$(RM) "portasm.d" 
