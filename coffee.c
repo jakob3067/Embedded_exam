@@ -199,9 +199,10 @@ void brew(int coffee)
                     // Give time to read LCD
                     vTaskDelay(pdMS_TO_TICKS(2000));
 
+                    is_brewing = 0;
+
                     // Send coffee type to UART
                     xQueueSend(xUARTQueue, &coffee_type, portMAX_DELAY);
-                    is_brewing = 0;
                     break;
                 }
             }

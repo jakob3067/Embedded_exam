@@ -30,7 +30,7 @@
 void card(void);
 INT8U validate_pay(INT8U *card_details, INT8U *card_pin);
 
-INT8U is_brewing;
+volatile INT8U is_brewing;
 
 // Create queues
 QueueHandle_t xLCDQueue;
@@ -69,9 +69,9 @@ int main(void)
 
     xTaskCreate( lcd_task, "lcd", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
     xTaskCreate( key_task, "key", USERTASK_STACK_SIZE, NULL, HIGH_PRIO, NULL);
-    xTaskCreate( button_task, "button", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
+    xTaskCreate( button_task, "button", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
     xTaskCreate( brew_task, "brew", USERTASK_STACK_SIZE * 2, NULL, MED_PRIO, NULL);
-    xTaskCreate( uart_log_task, "log", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
+    xTaskCreate( uart_log_task, "log", USERTASK_STACK_SIZE * 2, NULL, LOW_PRIO, NULL);
     xTaskCreate( ui_task, "ui", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
     xTaskCreate( encoder_task, "encoder", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
     xTaskCreate( menu_task, "menu", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);

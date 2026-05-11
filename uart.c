@@ -10,6 +10,7 @@
 #include "lcd.h"
 #include "rtc.h"
 #include "string.h"
+#include "coffee.h"
 /*****************************    Defines    *******************************/
 
 extern QueueHandle_t xUARTQueue;
@@ -184,6 +185,10 @@ void uart_log_task(void *pvParameters)
     // Read from UART Queue
     if (xQueueReceive(xUARTQueue, &coffee_type, portMAX_DELAY) == pdTRUE)
     {
+      pStr = (INT8U *)"Test... ";
+      xQueueSend(xLCDQueue, (void *) &pStr, portMAX_DELAY);
+      // Make sure logging is readable in LCD
+      vTaskDelay(pdMS_TO_TICKS(2000));
       char *msg;
       switch (coffee_type)
       {
@@ -196,9 +201,6 @@ void uart_log_task(void *pvParameters)
       pStr = (INT8U *)"Logging... ";
       xQueueSend(xLCDQueue, (void *) &pStr, portMAX_DELAY);
       // Make sure logging is readable in LCD
-      vTaskDelay(pdMS_TO_TICKS(2000));
-
-      while (xQueueReceive(xLCDQueue, &discard, 0) == pdTRUE);
       vTaskDelay(pdMS_TO_TICKS(2000));
 
       // Get current time from RTC

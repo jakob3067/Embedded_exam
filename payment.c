@@ -31,7 +31,7 @@ void payment_task(void *pvParameters)
     INT8U key_val;
     INT8U btn_event;
     INT8U coin;
-    INT8U cash;
+    INT8U cash = 0;
     INT8U success = 1;
 
     while(1)
@@ -101,7 +101,6 @@ void payment_task(void *pvParameters)
                         xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
                         vTaskDelay(pdMS_TO_TICKS(3000));
                         card();
-                        return;
                     }
                 }
             }
@@ -178,6 +177,7 @@ void card(void)
             pStr = (INT8U *)"Payment OK!";
             xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
             vTaskDelay(pdMS_TO_TICKS(3000));
+            xQueueSend(xPaymentStatusQueue, &success, portMAX_DELAY);
         }
         else
         {

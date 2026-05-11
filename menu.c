@@ -96,6 +96,10 @@ void menu_task(void *pvParameters)
                 }
             }
         }
+        else
+        {
+            vTaskDelay(pdMS_TO_TICKS(50));
+        }
     }
 }
 
