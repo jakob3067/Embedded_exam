@@ -30,6 +30,7 @@ extern QueueHandle_t xLCDQueue;
 extern QueueHandle_t xButtonQueue;
 extern QueueHandle_t xUARTQueue;
 extern QueueHandle_t xEncoderQueue;
+extern QueueHandle_t xKeyQueue;
 //extern QueueHandle_t xMenuQueue;
 
 /*****************************   Constants   *******************************/
@@ -49,7 +50,7 @@ void brew(int coffee)
     INT8U cash_buffer[20];
 
 
-
+    payment_option();
     if (coffee == 0)
     {
         // Espresso
@@ -222,12 +223,6 @@ void payment_option(void)
 {
     INT8U *pStr;
     INT8U btn_event;
-    INT8U card_details[16];
-    INT8U card_pin[4];
-    INT8U display_buf[17];  // buffer for '*' display
-    INT8U digit;
-    int i;
-
     pStr = (INT8U *)"1.Cash 2.Card";
     xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
 
@@ -248,15 +243,24 @@ void payment_option(void)
                 pStr = (INT8U *)"Card selected";
                 xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
                 vTaskDelay(pdMS_TO_TICKS(3000));
-                break;  // proceed to card entry
+                card();
+                return;
             }
         }
     }
-        while{
-        // --- Card number entry (16 digits) ---
+}
+void card(void)
+{
+    while(1)
+    {
+        INT8U *pStr;
+        INT8U card_details[16];
+        INT8U card_pin[4];
+        INT8U display_buf[17];  // buffer for '*' display
+        INT8U digit;
+        int i;
         pStr = (INT8U *)"Enter card nr:";
         xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
-
         for (i = 0; i < 16; i++)
         {
             if (xQueueReceive(xKeyQueue, &digit, portMAX_DELAY) == pdTRUE)
@@ -270,13 +274,11 @@ void payment_option(void)
                     continue;
                 }
                 card_details[i] = digit;
-
                 // Show '*' for each entered digit
                 int j;
                 for (j = 0; j <= i; j++)
                     display_buf[j] = '*';
                 display_buf[i+1] = '\0';
-
                 INT8U *pDisplay = display_buf;
                 xQueueSend(xLCDQueue, &pDisplay, portMAX_DELAY);
             }
@@ -285,7 +287,6 @@ void payment_option(void)
         // --- PIN entry (4 digits) ---
         pStr = (INT8U *)"Enter PIN:";
         xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
-
         for (i = 0; i < 4; i++)
         {
             if (xQueueReceive(xKeyQueue, &digit, portMAX_DELAY) == pdTRUE)
@@ -299,13 +300,11 @@ void payment_option(void)
                     continue;
                 }
                 card_pin[i] = digit;
-
                 // Show '*' for each entered digit
                 int j;
                 for (j = 0; j <= i; j++)
                     display_buf[j] = '*';
                 display_buf[i+1] = '\0';
-
                 INT8U *pDisplay = display_buf;
                 xQueueSend(xLCDQueue, &pDisplay, portMAX_DELAY);
             }
@@ -323,15 +322,13 @@ void payment_option(void)
             pStr = (INT8U *)"Payment failed";
             xQueueSend(xLCDQueue, &pStr, portMAX_DELAY);
             vTaskDelay(pdMS_TO_TICKS(3000));
-            // loop back and try again
+            break;
         }
+        // --- Dummy validation ---
+        // Always accepts for now - replace with real validation later
+        vTaskDelay(pdMS_TO_TICKS(3000));
     }
-    // --- Dummy validation ---
-    // Always accepts for now - replace with real validation later
-    vTaskDelay(pdMS_TO_TICKS(3000));
 }
-}
-
 
 INT8U validate_pay(INT8U *card_details, INT8U *card_pin)
 {
