@@ -18,8 +18,7 @@
 #include "coffee.h"
 #include "queue.h"
 #include "gpio.h"
-
-
+#include "payment.h"
 
 #define USERTASK_STACK_SIZE configMINIMAL_STACK_SIZE
 #define IDLE_PRIO 0
@@ -27,6 +26,9 @@
 #define MED_PRIO  2
 #define HIGH_PRIO 3
 #define QUEUE_LEN 16
+
+void card(void);
+INT8U validate_pay(INT8U *card_details, INT8U *card_pin);
 
 INT8U is_brewing;
 
@@ -38,6 +40,8 @@ QueueHandle_t xUARTQueue;
 QueueHandle_t xEncoderQueue;
 QueueHandle_t xMenuQueue;
 QueueHandle_t xKeyQueue;
+QueueHandle_t xPaymentQueue;
+QueueHandle_t xPaymentStatusQueue;
 
 static void setupHardware(void){
   // Warning: If you do not initialize the hardware clock, the timings will be inaccurate
@@ -60,15 +64,23 @@ int main(void)
     xEncoderQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U));
     xMenuQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U));
     xKeyQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U));
+    xPaymentQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U));
+    xPaymentStatusQueue = xQueueCreate(QUEUE_LEN, sizeof(INT8U));
 
     xTaskCreate( lcd_task, "lcd", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
     xTaskCreate( key_task, "key", USERTASK_STACK_SIZE, NULL, HIGH_PRIO, NULL);
     xTaskCreate( button_task, "button", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
-    xTaskCreate( brew_task, "brew", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
+    xTaskCreate( brew_task, "brew", USERTASK_STACK_SIZE * 2, NULL, MED_PRIO, NULL);
     xTaskCreate( uart_log_task, "log", USERTASK_STACK_SIZE, NULL, LOW_PRIO, NULL);
     xTaskCreate( ui_task, "ui", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
-    xTaskCreate(payment_option, "pay", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
+    xTaskCreate( encoder_task, "encoder", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
+    xTaskCreate( menu_task, "menu", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
+    xTaskCreate( payment_task, "menu", USERTASK_STACK_SIZE, NULL, MED_PRIO, NULL);
+
     //payment_option();
+
+    is_brewing = 0;
+
     vTaskStartScheduler();
 
 	while(1){
